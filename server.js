@@ -47,10 +47,11 @@ const supabase = createClient(
 })();
 
 // 3. Mail Taşıyıcısı (Özel SMTP Sunucusu)
+const smtpPort = parseInt(process.env.SMTP_PORT) || 465;
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.turkticaret.net',
-    port: parseInt(process.env.SMTP_PORT) || 465,
-    secure: true, // SSL/TLS için true
+    port: smtpPort,
+    secure: smtpPort === 465, // 465 için true (SSL), 587 için false (STARTTLS)
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
