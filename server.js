@@ -183,6 +183,7 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
 
                 // Memnuniyet butonları için linkler
                 const satisfiedLink = `${BASE_URL}/api/satisfaction-response?userId=${user.id}&response=1`;
+                const neutralLink = `${BASE_URL}/api/satisfaction-response?userId=${user.id}&response=2`;
                 const notSatisfiedLink = `${BASE_URL}/api/satisfaction-response?userId=${user.id}&response=0`;
 
                 // Not bölümü - eğer not varsa göster
@@ -234,10 +235,13 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
                                     
                                     <div class="buttons">
                                         <a href="${satisfiedLink}" class="btn btn-success">
-                                            🚀 Dersi Beğendim
+                                            🚀 Harikaydı
+                                        </a>
+                                        <a href="${neutralLink}" class="btn" style="background-color: #f59e0b; color: white; border-bottom: 3px solid #d97706;">
+                                            🤔 Fena Değil
                                         </a>
                                         <a href="${notSatisfiedLink}" class="btn btn-danger">
-                                            💡 Geliştirilmeli (Beğenmedim)
+                                            👎 Beğenmedim
                                         </a>
                                     </div>
                                 </div>
@@ -329,7 +333,7 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
 app.get('/api/satisfaction-response', async (req, res) => {
     const { userId, response } = req.query;
 
-    if (!userId || (response !== '0' && response !== '1')) {
+    if (!userId || (response !== '0' && response !== '1' && response !== '2')) {
         return res.status(400).send('Geçersiz istek.');
     }
 
@@ -346,17 +350,27 @@ app.get('/api/satisfaction-response', async (req, res) => {
         if (error) throw error;
 
         const responseInt = parseInt(response);
-        let statusText = responseInt === 1 ? 'Memnun' : 'Memnun Değil';
+        let statusText = '';
+        if (responseInt === 1) statusText = 'Memnun';
+        else if (responseInt === 2) statusText = 'Kararsız';
+        else statusText = 'Memnun Değil';
+
         console.log(`✅ Kullanıcı #${userId} cevabı kaydedildi: ${statusText}`);
 
         // TÜM İSTEMCİLERE BİLDİR (REALTIME UPDATE)
         notifyClients();
 
         // Teşekkür sayfası
-        let emoji = responseInt === 1 ? '😊' : '😔';
-        let message = responseInt === 1
-            ? 'Memnun kaldığınızı duyduğumuza çok sevindik!'
-            : 'Geri bildiriminiz için teşekkürler. Eksiklerimizi gidermek için çalışacağız.';
+        let emoji = '😊';
+        let message = 'Memnun kaldığınızı duyduğumuza çok sevindik!';
+
+        if (responseInt === 2) {
+            emoji = '🤔';
+            message = 'Geri bildiriminiz için teşekkürler. Daha iyisini yapabilmek için çalışacağız.';
+        } else if (responseInt === 0) {
+            emoji = '😔';
+            message = 'Geri bildiriminiz için teşekkürler. Eksiklerimizi gidermek için çalışacağız.';
+        }
 
         res.send(`
             <!DOCTYPE html>
@@ -485,11 +499,12 @@ app.get('/api/satisfaction-stats', async (req, res) => {
 
         // Loose equality (==) kullanarak string/number/boolean farkını yoksay
         const satisfiedCount = users.filter(u => u.satisfaction_response == 1).length;
+        const neutralCount = users.filter(u => u.satisfaction_response == 2).length;
         const notSatisfiedCount = users.filter(u => u.satisfaction_response == 0).length;
 
         // Debug log
         if (totalResponses > 0) {
-            console.log(`📊 Stats Debug: Total:${totalResponses}, Happy:${satisfiedCount}, Sad:${notSatisfiedCount}`);
+            console.log(`📊 Stats Debug: Total:${totalResponses}, Happy:${satisfiedCount}, Neutral:${neutralCount}, Sad:${notSatisfiedCount}`);
         }
 
         res.json({
@@ -497,12 +512,13 @@ app.get('/api/satisfaction-stats', async (req, res) => {
             emailsSent: emailsSent,
             totalResponses: totalResponses,
             satisfiedCount: satisfiedCount,
+            neutralCount: neutralCount,
             notSatisfiedCount: notSatisfiedCount,
             responseRate: emailsSent > 0
                 ? ((totalResponses / emailsSent) * 100).toFixed(1)
                 : '0.0',
             satisfactionRate: totalResponses > 0
-                ? ((satisfiedCount / totalResponses) * 100).toFixed(1)
+                ? (((satisfiedCount + (neutralCount * 0.5)) / totalResponses) * 100).toFixed(1)
                 : '0.0'
         });
 
