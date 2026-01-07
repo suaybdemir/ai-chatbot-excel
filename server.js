@@ -57,7 +57,10 @@ const transporter = nodemailer.createTransport({
     },
     tls: {
         rejectUnauthorized: false // Sertifika hatalarını ignore et
-    }
+    },
+    connectionTimeout: 10000, // 10 saniye bağlantı timeout
+    greetingTimeout: 10000,   // 10 saniye greeting timeout
+    socketTimeout: 15000      // 15 saniye socket timeout
 });
 
 // Dosya yükleme ayarı
