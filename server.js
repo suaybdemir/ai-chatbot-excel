@@ -426,7 +426,7 @@ app.get('/api/satisfaction-stats', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log('------------------------------------------------');
     console.log(`🚀 Server çalışıyor: ${BASE_URL}`);
     console.log('🤖 Mistral AI: SDK v1.x Aktif');
