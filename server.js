@@ -78,7 +78,13 @@ app.post('/api/chat', async (req, res) => {
         // Yeni SDK'da 'chat.complete' kullanılıyor
         const chatResponse = await mistral.chat.complete({
             model: 'mistral-tiny',
-            messages: [{ role: 'user', content: message }],
+            messages: [
+                {
+                    role: 'system',
+                    content: 'Sen Türkçe konuşan yardımcı bir asistansın. Her zaman Türkçe cevap ver. Kullanıcılara nazik ve profesyonel bir şekilde yardımcı ol. Kısa ve öz cevaplar ver.'
+                },
+                { role: 'user', content: message }
+            ],
         });
 
         // Cevap yapısı da bazen değişebilir, burayı güvenli hale getirdik
@@ -198,77 +204,162 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
                         <html>
                         <head>
                             <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
                             <style>
-                                body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #ffffff; color: #333333; margin: 0; padding: 0; line-height: 1.6; }
-                                .container { max-width: 600px; margin: 0 auto; padding: 40px 20px; text-align: left; }
-                                .header { margin-bottom: 30px; border-bottom: 2px solid #f3f4f6; padding-bottom: 20px; }
-                                h1 { font-size: 22px; font-weight: 700; margin: 0; color: #111827; }
-                                p { font-size: 16px; margin-bottom: 20px; color: #4b5563; }
-                                .rating-box { margin-top: 30px; padding: 20px 0; border-top: 1px solid #f3f4f6; border-bottom: 1px solid #f3f4f6; }
-                                .rating-label { font-weight: 600; font-size: 14px; margin-bottom: 15px; display: block; color: #111827; text-transform: uppercase; letter-spacing: 0.5px; }
-                                .stars { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; } /* Gap artırıldı, ortalandı */
+                                body { 
+                                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+                                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                    color: #333333; 
+                                    margin: 0; 
+                                    padding: 20px; 
+                                    line-height: 1.6; 
+                                    min-height: 100vh;
+                                }
+                                .card {
+                                    max-width: 560px; 
+                                    margin: 0 auto; 
+                                    padding: 40px;
+                                    background: #ffffff;
+                                    border-radius: 24px;
+                                    box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+                                }
+                                .header { 
+                                    text-align: center;
+                                    margin-bottom: 32px; 
+                                    padding-bottom: 24px;
+                                    border-bottom: 1px solid #e5e7eb;
+                                }
+                                .logo {
+                                    width: 60px;
+                                    height: 60px;
+                                    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+                                    border-radius: 16px;
+                                    margin: 0 auto 16px;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    font-size: 28px;
+                                }
+                                h1 { 
+                                    font-size: 20px; 
+                                    font-weight: 700; 
+                                    margin: 0; 
+                                    color: #111827;
+                                    line-height: 1.4;
+                                }
+                                .greeting { 
+                                    font-size: 16px; 
+                                    color: #4b5563; 
+                                    margin-bottom: 24px;
+                                }
+                                
+                                /* Puan Kartı */
+                                .grade-card { 
+                                    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+                                    border: 2px solid #7dd3fc;
+                                    border-radius: 16px;
+                                    padding: 24px;
+                                    text-align: center;
+                                    margin-bottom: 28px;
+                                }
+                                .grade-label {
+                                    font-size: 13px;
+                                    color: #0369a1;
+                                    font-weight: 600;
+                                    text-transform: uppercase;
+                                    letter-spacing: 1px;
+                                    margin-bottom: 8px;
+                                }
+                                .grade-value {
+                                    font-size: 42px;
+                                    font-weight: 800;
+                                    color: #0284c7;
+                                    line-height: 1;
+                                }
+                                
+                                .message { 
+                                    font-size: 15px; 
+                                    color: #4b5563; 
+                                    margin-bottom: 28px;
+                                    text-align: center;
+                                }
+                                
+                                /* Puanlama Bölümü */
+                                .rating-section {
+                                    background: #f8fafc;
+                                    border-radius: 16px;
+                                    padding: 28px;
+                                    text-align: center;
+                                }
+                                .rating-title { 
+                                    font-weight: 700; 
+                                    font-size: 15px; 
+                                    margin-bottom: 20px; 
+                                    color: #111827;
+                                }
+                                .stars-row { 
+                                    display: flex; 
+                                    justify-content: center;
+                                    gap: 10px; 
+                                    flex-wrap: wrap;
+                                    margin-bottom: 12px;
+                                }
                                 .star-btn { 
                                     text-decoration: none; 
-                                    display: inline-flex; 
-                                    justify-content: center; 
-                                    align-items: center; 
-                                    width: 55px; /* Büyütüldü (Mobil için rahat tıklama) */
-                                    height: 55px; 
-                                    border: 2px solid #e5e7eb; /* Çerçeve kalınlaştırıldı */
-                                    border-radius: 12px; 
-                                    color: #4b5563; 
-                                    font-weight: 800; 
-                                    font-size: 22px; /* Rakam büyütüldü */
-                                    transition: all 0.2s;
-                                    background: #ffffff;
-                                    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-                                }
-                                .star-btn:hover { background-color: #f9fafb; border-color: #9ca3af; color: #111827; transform: translateY(-2px); }
-                                .star-1:hover { background-color: #fee2e2; border-color: #ef4444; color: #7f1d1d; } 
-                                .star-2:hover { background-color: #ffedd5; border-color: #f97316; color: #7c2d12; } 
-                                .star-3:hover { background-color: #fef9c3; border-color: #eab308; color: #713f12; } 
-                                .star-4:hover { background-color: #dcfce7; border-color: #22c55e; color: #14532d; } 
-                                .star-5:hover { background-color: #d1fae5; border-color: #10b981; color: #064e3b; } 
-                                
-                                .footer { margin-top: 40px; font-size: 13px; color: #9ca3af; border-top: 1px solid #f3f4f6; padding-top: 20px; text-align: center; }
-                                
-                                /* Not Alanı İyileştirmesi */
-                                .not-area { 
-                                    margin-bottom: 30px; 
-                                    font-style: normal; /* İtalik kalktı, daha okunaklı */
-                                    color: #1f2937; 
-                                    background: #f3f4f6; 
-                                    padding: 25px; 
-                                    border-radius: 12px; 
-                                    border-left: 5px solid #3b82f6; /* Mavi bar belirginleştirildi */
-                                    font-size: 24px; /* Not boyutu ciddi şekilde büyütüldü */
-                                    font-weight: 700;
+                                    display: inline-block;
+                                    width: 52px; 
+                                    height: 52px;
+                                    line-height: 52px;
                                     text-align: center;
-                                    letter-spacing: 0.5px;
+                                    border-radius: 12px; 
+                                    font-weight: 700; 
+                                    font-size: 18px;
+                                    color: white;
+                                }
+                                .star-1 { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+                                .star-2 { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); }
+                                .star-3 { background: linear-gradient(135deg, #eab308 0%, #ca8a04 100%); }
+                                .star-4 { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); }
+                                .star-5 { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+                                .rating-hint {
+                                    font-size: 12px;
+                                    color: #9ca3af;
+                                }
+                                
+                                .footer { 
+                                    margin-top: 32px; 
+                                    font-size: 12px; 
+                                    color: #9ca3af; 
+                                    text-align: center;
+                                    padding-top: 20px;
+                                    border-top: 1px solid #e5e7eb;
                                 }
                             </style>
                         </head>
                         <body>
-                            <div class="container">
+                            <div class="card">
                                 <div class="header">
+                                    <div class="logo">🤖</div>
                                     <h1>Yüksek Trafikli Sistemlerde<br>AI Chatbot Geliştirme</h1>
                                 </div>
                                 
-                                <p>Sayın <strong>${fullName}</strong>,</p>
+                                <p class="greeting">Sayın <strong>${fullName}</strong>,</p>
                                 
-                                ${notSection ? `<div class="not-area">"${not}"</div>` : ''}
+                                ${notSection ? `
+                                <div class="grade-card">
+                                    <div class="grade-label">Ders Notunuz</div>
+                                    <div class="grade-value">${not}</div>
+                                </div>
+                                ` : ''}
                                 
-                                <p>Eğitimimize katılımınız için teşekkür ederiz. Kalitemizi artırmak için görüşleriniz bizim için çok önemli.</p>
-                                <p>Lütfen eğitimi 1'den 5'e kadar puanlayın:</p>
+                                <p class="message">Eğitimimize katılımınız için teşekkür ederiz. Kalitemizi artırmak için görüşleriniz bizim için çok değerli.</p>
                                 
-                                <div class="rating-box">
-                                    <span class="rating-label">Dersi Puanlayın</span>
-                                    <div class="stars">
-                                        ${starLinks.map(s => `
-                                            <a href="${s.url}" class="star-btn star-${s.score}">${s.score}</a>
-                                        `).join('')}
-                                        <span style="display:flex; align-items:center; margin-left:10px; font-size:12px; color:#9ca3af;">(1: Kötü, 5: Mükemmel)</span>
+                                <div class="rating-section">
+                                    <div class="rating-title">📊 Eğitimi Puanlayın</div>
+                                    <div class="stars-row">
+                                        ${starLinks.map(s => `<a href="${s.url}" class="star-btn star-${s.score}">${'★'.repeat(s.score)}</a>`).join('')}
                                     </div>
+                                    <div class="rating-hint">1 yıldız: Kötü → 5 yıldız: Mükemmel</div>
                                 </div>
                                 
                                 <div class="footer">
