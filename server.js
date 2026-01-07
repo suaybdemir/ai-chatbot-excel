@@ -9,9 +9,13 @@ const fs = require('fs');
 // SDK'yı yeni sürüme uygun çağırıyoruz:
 const { Mistral } = require('@mistralai/mistralai');
 
-// Port ve Base URL ayarları (Hugging Face Spaces için)
+// Port ve Base URL ayarları (Railway ve Hugging Face Spaces için)
 const PORT = process.env.PORT || 7860;
-const BASE_URL = process.env.SPACE_HOST ? `https://${process.env.SPACE_HOST}` : `http://localhost:${PORT}`;
+const BASE_URL = process.env.RAILWAY_PUBLIC_DOMAIN
+    ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`
+    : process.env.SPACE_HOST
+        ? `https://${process.env.SPACE_HOST}`
+        : `http://localhost:${PORT}`;
 
 const app = express();
 app.use(cors());
