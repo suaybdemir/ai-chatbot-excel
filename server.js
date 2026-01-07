@@ -187,11 +187,19 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
                 const { id, name, surname, email, not } = user;
                 const fullName = `${name} ${surname}`.trim() || 'Değerli Kullanıcı';
 
-                // Puanlama Linkleri (1-5)
+                // Puanlama Linkleri (1-5) - Türkçe etiketlerle
+                const ratingLabels = {
+                    1: 'Çok Kötü',
+                    2: 'Kötü',
+                    3: 'Orta',
+                    4: 'İyi',
+                    5: 'Mükemmel'
+                };
                 const stars = [1, 2, 3, 4, 5];
                 const starLinks = stars.map(score => {
                     return {
                         score,
+                        label: ratingLabels[score],
                         url: `${BASE_URL}/api/satisfaction-response?userId=${user.id}&response=${score}`
                     };
                 });
@@ -289,40 +297,46 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
                                     text-align: center;
                                 }
                                 
-                                /* Puanlama Bölümü - Büyük parmaklar için optimize edildi */
+                                /* Puanlama Bölümü - Email uyumlu tablo tasarımı */
                                 .rating-section {
                                     background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
                                     border-radius: 24px;
-                                    padding: 40px 20px;
+                                    padding: 32px 16px;
                                     text-align: center;
                                 }
                                 .rating-title { 
                                     font-weight: 700; 
-                                    font-size: 22px; 
-                                    margin-bottom: 28px; 
+                                    font-size: 20px; 
+                                    margin-bottom: 24px; 
                                     color: white;
                                 }
-                                .stars-row { 
-                                    display: flex; 
-                                    justify-content: center;
-                                    gap: 24px; 
-                                    flex-wrap: wrap;
-                                    margin-bottom: 20px;
+                                .rating-table {
+                                    width: 100%;
+                                    border-collapse: separate;
+                                    border-spacing: 8px;
+                                }
+                                .rating-cell {
+                                    padding: 0;
                                 }
                                 .star-btn { 
                                     text-decoration: none; 
-                                    display: inline-flex;
-                                    align-items: center;
-                                    justify-content: center;
-                                    width: 100px; 
-                                    height: 100px;
+                                    display: block;
+                                    padding: 16px 8px;
                                     text-align: center;
-                                    border-radius: 20px; 
-                                    font-weight: 800; 
-                                    font-size: 40px;
+                                    border-radius: 16px; 
                                     color: white;
-                                    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-                                    transition: transform 0.2s;
+                                    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+                                }
+                                .star-label {
+                                    font-weight: 700;
+                                    font-size: 14px;
+                                    display: block;
+                                    margin-bottom: 4px;
+                                }
+                                .star-number {
+                                    font-weight: 800;
+                                    font-size: 28px;
+                                    display: block;
                                 }
                                 .star-1 { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
                                 .star-2 { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); }
@@ -330,9 +344,9 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
                                 .star-4 { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); }
                                 .star-5 { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
                                 .rating-hint {
-                                    font-size: 14px;
+                                    font-size: 13px;
                                     color: rgba(255,255,255,0.8);
-                                    margin-top: 8px;
+                                    margin-top: 16px;
                                 }
                                 
                                 .footer { 
@@ -365,10 +379,19 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
                                 
                                 <div class="rating-section">
                                     <div class="rating-title">⭐ Eğitimi Puanlayın</div>
-                                    <div class="stars-row">
-                                        ${starLinks.map(s => `<a href="${s.url}" class="star-btn star-${s.score}">${s.score}</a>`).join('')}
-                                    </div>
-                                    <div class="rating-hint">1: Kötü → 5: Mükemmel</div>
+                                    <table class="rating-table" role="presentation" cellpadding="0" cellspacing="0">
+                                        <tr>
+                                            ${starLinks.map(s => `
+                                            <td class="rating-cell" style="padding: 6px;">
+                                                <a href="${s.url}" class="star-btn star-${s.score}" style="display: block; text-decoration: none; padding: 20px 10px; text-align: center; border-radius: 16px; color: white;">
+                                                    <span class="star-label" style="font-weight: 700; font-size: 13px; display: block; margin-bottom: 6px;">${s.label}</span>
+                                                    <span class="star-number" style="font-weight: 800; font-size: 32px; display: block;">${s.score}</span>
+                                                </a>
+                                            </td>
+                                            `).join('')}
+                                        </tr>
+                                    </table>
+                                    <div class="rating-hint">Değerlendirmeniz için teşekkürler!</div>
                                 </div>
                                 
                                 <div class="footer">
