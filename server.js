@@ -42,12 +42,17 @@ const supabase = createClient(
     }
 })();
 
-// 3. Mail Taşıyıcısı (Gmail)
+// 3. Mail Taşıyıcısı (Özel SMTP Sunucusu)
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: process.env.SMTP_HOST || 'smtp.turkticaret.net',
+    port: parseInt(process.env.SMTP_PORT) || 465,
+    secure: true, // SSL/TLS için true
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
+    },
+    tls: {
+        rejectUnauthorized: false // Sertifika hatalarını ignore et
     }
 });
 
