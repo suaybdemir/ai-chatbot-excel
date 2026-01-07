@@ -3,7 +3,7 @@ const express = require('express');
 const { createClient } = require('@supabase/supabase-js');
 const multer = require('multer');
 const xlsx = require('xlsx');
-const { Resend } = require('resend');
+const Mailjet = require('node-mailjet');
 const cors = require('cors');
 const fs = require('fs');
 // SDK'yı yeni sürüme uygun çağırıyoruz:
@@ -46,9 +46,13 @@ const supabase = createClient(
     }
 })();
 
-// 3. Resend Email Client
-const resend = new Resend(process.env.RESEND_API_KEY);
-const EMAIL_FROM = process.env.EMAIL_FROM || 'onboarding@resend.dev';
+// 3. Mailjet Email Client
+const mailjet = new Mailjet({
+    apiKey: process.env.MAILJET_API_KEY,
+    apiSecret: process.env.MAILJET_SECRET_KEY
+});
+const EMAIL_FROM = process.env.EMAIL_FROM || 'noreply@example.com';
+const EMAIL_FROM_NAME = process.env.EMAIL_FROM_NAME || 'Bildirim Sistemi';
 
 // Dosya yükleme ayarı
 const upload = multer({ dest: 'uploads/' });
@@ -180,11 +184,7 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
                     </div>
                 ` : '';
 
-                const mailOptions = {
-                    from: EMAIL_FROM,
-                    to: email,
-                    subject: not !== '' ? `Notunuz: ${not} - Hizmetimizden Memnun Musunuz?` : 'Hizmetimizden Memnun Musunuz?',
-                    html: `
+                const htmlContent = `
                         <!DOCTYPE html>
                         <html>
                         <head>
@@ -216,16 +216,32 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
                             </div>
                         </body>
                         </html>
-                    `
-                };
+                    `;
 
                 try {
-                    // Resend ile email gönder
-                    const { data, error: sendError } = await resend.emails.send(mailOptions);
+                    // Mailjet ile email gönder
+                    const result = await mailjet
+                        .post("send", { 'version': 'v3.1' })
+                        .request({
+                            "Messages": [
+                                {
+                                    "From": {
+                                        "Email": EMAIL_FROM,
+                                        "Name": EMAIL_FROM_NAME
+                                    },
+                                    "To": [
+                                        {
+                                            "Email": email,
+                                            "Name": fullName
+                                        }
+                                    ],
+                                    "Subject": not !== '' ? `Notunuz: ${not} - Hizmetimizden Memnun Musunuz?` : 'Hizmetimizden Memnun Musunuz?',
+                                    "HTMLPart": htmlContent
+                                }
+                            ]
+                        });
 
-                    if (sendError) {
-                        throw new Error(sendError.message);
-                    }
+                    console.log(`📨 Mailjet Yanıtı (${email}):`, result.body.Messages[0].Status);
 
                     // Veritabanını güncelle
                     const { error } = await supabase
