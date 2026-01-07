@@ -5,8 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Chat & Excel Mailer</title>
+    <meta name="description"
+        content="AI destekli chatbot ve Excel mail gönderici - Memnuniyet anketleri ve otomatik mail sistemi">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -16,133 +18,323 @@
         :root {
             --primary-color: #6366f1;
             --primary-hover: #4f46e5;
+            --primary-glow: rgba(99, 102, 241, 0.4);
             --secondary-color: #f8fafc;
+            --accent-color: #8b5cf6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
             --text-primary: #1e293b;
             --text-secondary: #64748b;
             --border-color: #e2e8f0;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
-            background-color: #f1f5f9;
-            height: 100vh;
-            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             overflow: hidden;
             color: var(--text-primary);
         }
 
         .main-row {
-            height: 100%;
+            height: 100vh;
+        }
+
+        /* Glassmorphism Card Style */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-xl);
         }
 
         /* Sol Taraf - Chat */
         .chat-section {
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
             display: flex;
             flex-direction: column;
             height: 100%;
-            border-right: 1px solid var(--border-color);
+            border-right: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 10px 0 40px rgba(0, 0, 0, 0.1);
         }
 
         .chat-header {
-            background: white;
-            padding: 20px;
-            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            padding: 20px 24px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 14px;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .chat-header-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            backdrop-filter: blur(10px);
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.2);
+            }
         }
 
         .chat-header h5 {
-            font-weight: 600;
+            font-weight: 700;
             margin: 0;
-            color: var(--text-primary);
+            color: white;
+            font-size: 1.2rem;
+            letter-spacing: -0.02em;
+        }
+
+        .chat-header .status-dot {
+            width: 10px;
+            height: 10px;
+            background: #4ade80;
+            border-radius: 50%;
+            margin-left: auto;
+            box-shadow: 0 0 10px #4ade80;
+            animation: status-pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes status-pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 0.7;
+            }
         }
 
         .chat-box {
             flex: 1;
             overflow-y: auto;
             padding: 24px;
-            background: #ffffff;
+            background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
             scroll-behavior: smooth;
+        }
+
+        .chat-box::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-box::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-box::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        .chat-box::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
 
         .message {
             margin-bottom: 16px;
-            padding: 12px 18px;
-            border-radius: 18px;
-            max-width: 85%;
+            padding: 14px 18px;
+            border-radius: 20px;
+            max-width: 80%;
             font-size: 0.95rem;
-            line-height: 1.5;
+            line-height: 1.6;
             position: relative;
+            animation: message-slide-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        @keyframes message-slide-in {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .message-content {
+            flex: 1;
+            padding-top: 6px;
         }
 
         .user-msg {
-            background-color: var(--primary-color);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
             color: white;
-            align-self: flex-end;
             margin-left: auto;
-            border-bottom-right-radius: 4px;
+            border-bottom-right-radius: 6px;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+            flex-direction: row-reverse;
+        }
+
+        .user-msg .message-avatar {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
         }
 
         .bot-msg {
-            background-color: #f1f5f9;
+            background: white;
             color: var(--text-primary);
-            align-self: flex-start;
-            border-bottom-left-radius: 4px;
+            border: 1px solid var(--border-color);
+            border-bottom-left-radius: 6px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .bot-msg .message-avatar {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            color: var(--primary-color);
+            border: 1px solid #bae6fd;
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 0;
+        }
+
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            background: var(--text-secondary);
+            border-radius: 50%;
+            animation: typing-bounce 1.4s ease-in-out infinite;
+        }
+
+        .typing-indicator span:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing-bounce {
+
+            0%,
+            60%,
+            100% {
+                transform: translateY(0);
+                opacity: 0.4;
+            }
+
+            30% {
+                transform: translateY(-8px);
+                opacity: 1;
+            }
         }
 
         .chat-input-area {
-            padding: 20px;
+            padding: 20px 24px;
             border-top: 1px solid var(--border-color);
             background: white;
         }
 
         .chat-input-wrapper {
-            background: #f8fafc;
-            border: 1px solid var(--border-color);
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 2px solid var(--border-color);
             border-radius: 50px;
-            padding: 5px;
+            padding: 6px 6px 6px 20px;
             display: flex;
             align-items: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .chat-input-wrapper:focus-within {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px var(--primary-glow);
+            background: white;
         }
 
         .chat-input {
             border: none;
             background: transparent;
-            padding: 10px 20px;
+            padding: 12px 0;
             flex: 1;
             outline: none;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+        }
+
+        .chat-input::placeholder {
+            color: var(--text-secondary);
         }
 
         .send-btn {
-            width: 40px;
-            height: 40px;
+            width: 46px;
+            height: 46px;
             border-radius: 50%;
-            background: var(--primary-color);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
             color: white;
             border: none;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            font-size: 1.1rem;
         }
 
         .send-btn:hover {
-            background: var(--primary-hover);
-            transform: scale(1.05);
+            transform: scale(1.08) rotate(5deg);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
         }
 
-        /* Scrollbar'ı tamamen GİZLE (Ama kaydırma çalışsın) */
-        .upload-section {
-            -ms-overflow-style: none;
-            /* IE ve Edge */
-            scrollbar-width: none;
-            /* Firefox */
-        }
-
-        /* Chrome, Safari ve Opera için gizle */
-        .upload-section::-webkit-scrollbar {
-            display: none;
+        .send-btn:active {
+            transform: scale(0.95);
         }
 
         /* Sağ Taraf - Upload */
@@ -152,46 +344,117 @@
             justify-content: center;
             align-items: center;
             height: 100%;
-            background: #f8fafc;
-            padding: 20px;
+            padding: 30px;
             overflow-y: auto;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .upload-section::-webkit-scrollbar {
+            display: none;
         }
 
         .card-custom {
             width: 100%;
-            max-width: 550px;
+            max-width: 520px;
             padding: 40px;
-            background: white;
-            border-radius: 24px;
-            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
-            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 28px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            animation: card-float 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        .section-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 20px;
+        @keyframes card-float {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-title-area {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .card-title-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%);
+            border-radius: 20px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+            margin: 0 auto 16px;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
         }
 
+        .card-title-area h4 {
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            font-size: 1.4rem;
+            letter-spacing: -0.02em;
+        }
+
+        .card-title-area p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        /* File Upload Area */
         .file-upload-wrapper {
             border: 2px dashed #cbd5e1;
-            border-radius: 12px;
-            padding: 30px;
+            border-radius: 20px;
+            padding: 40px 30px;
             text-align: center;
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
             position: relative;
-            background: #f8fafc;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
             margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .file-upload-wrapper::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
         }
 
         .file-upload-wrapper:hover {
             border-color: var(--primary-color);
-            background: #eff6ff;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.15);
+        }
+
+        .file-upload-wrapper:hover::before {
+            opacity: 0.05;
+        }
+
+        .file-upload-wrapper.drag-over {
+            border-color: var(--primary-color);
+            border-style: solid;
+            background: linear-gradient(135deg, #eff6ff 0%, #e0e7ff 100%);
+            transform: scale(1.02);
+            box-shadow: 0 15px 40px rgba(99, 102, 241, 0.2);
+        }
+
+        .file-upload-wrapper.drag-over::before {
+            opacity: 0.1;
         }
 
         .file-upload-wrapper input[type="file"] {
@@ -202,106 +465,314 @@
             height: 100%;
             opacity: 0;
             cursor: pointer;
+            z-index: 2;
         }
 
         .upload-icon {
-            font-size: 2rem;
+            font-size: 2.5rem;
             color: #94a3b8;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             display: block;
+            transition: all 0.3s;
+        }
+
+        .file-upload-wrapper:hover .upload-icon {
+            color: var(--primary-color);
+            transform: translateY(-4px);
+        }
+
+        .file-upload-wrapper.file-selected .upload-icon {
+            color: var(--success-color);
         }
 
         .upload-text {
             color: var(--text-secondary);
-            font-size: 0.9rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .upload-hint {
+            color: #94a3b8;
+            font-size: 0.8rem;
+            margin-top: 8px;
         }
 
         .file-name-display {
-            margin-top: 10px;
-            font-size: 0.85rem;
+            margin-top: 12px;
+            font-size: 0.9rem;
             color: var(--primary-color);
             font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            animation: fade-in 0.3s ease;
+        }
+
+        @keyframes fade-in {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .action-btn {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%);
             border: none;
             color: white;
-            font-weight: 600;
-            padding: 12px;
-            border-radius: 12px;
-            transition: all 0.2s;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+            font-weight: 700;
+            padding: 16px 24px;
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.35);
+            font-size: 1rem;
+            letter-spacing: -0.01em;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
         }
 
         .action-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(16, 185, 129, 0.45);
+        }
+
+        .action-btn:hover:not(:disabled)::before {
+            opacity: 1;
+        }
+
+        .action-btn:active:not(:disabled) {
+            transform: translateY(-1px);
         }
 
         .action-btn:disabled {
-            background: #cbd5e1;
+            background: #94a3b8;
             transform: none;
             box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        /* Divider */
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+            margin: 28px 0;
+        }
+
+        /* Statistics Area */
+        .stats-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .stats-header h6 {
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .live-badge {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            color: #166534;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid #86efac;
+        }
+
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            background: #22c55e;
+            border-radius: 50%;
+            animation: status-pulse 1.5s ease-in-out infinite;
         }
 
         .stats-card {
-            background: #f8fafc;
-            border-radius: 16px;
-            padding: 20px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 20px;
+            padding: 24px;
             border: 1px solid var(--border-color);
         }
 
         .stat-item {
-            padding: 10px;
+            padding: 16px;
+            background: white;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
 
         .stat-label {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--text-secondary);
             margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
         }
 
         .stat-value {
-            font-size: 1.25rem;
-            font-weight: 700;
+            font-size: 1.5rem;
+            font-weight: 800;
             color: var(--text-primary);
         }
 
-        .progress-bar-custom {
+        .stat-value.text-primary {
+            color: var(--primary-color) !important;
+        }
+
+        .stat-value.text-info {
+            color: #0ea5e9 !important;
+        }
+
+        /* Clear DB Button */
+        .clear-db-btn {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .clear-db-btn:hover {
+            color: var(--danger-color);
+            background: #fef2f2;
+        }
+
+        /* Alert Styles */
+        .alert-custom {
+            border: none;
+            border-radius: 14px;
+            padding: 14px 18px;
+            font-size: 0.9rem;
+            animation: alert-slide 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes alert-slide {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success-custom {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+
+        .alert-danger-custom {
+            background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        /* Progress Bar */
+        .progress-custom {
             height: 8px;
             border-radius: 4px;
-            background-color: #e2e8f0;
+            background: #e2e8f0;
             overflow: hidden;
-            margin-top: 10px;
         }
 
-        .progress-fill {
-            height: 100%;
-            transition: width 0.5s ease;
+        .progress-bar {
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        /* Rating Distribution */
+        .rating-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 6px;
+            font-size: 0.8rem;
+        }
+
+        .rating-row .score {
+            width: 20px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .rating-row .bar-wrap {
+            flex: 1;
+            margin: 0 10px;
+        }
+
+        .rating-row .count {
+            width: 30px;
+            text-align: right;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
             body {
                 overflow: auto;
                 height: auto;
             }
 
+            .main-row {
+                height: auto;
+            }
+
             .chat-section {
-                height: 600px;
+                height: 70vh;
+                min-height: 500px;
                 border-right: none;
-                border-bottom: 1px solid var(--border-color);
             }
 
             .upload-section {
-                padding: 10px;
-                background: white;
+                padding: 20px;
+                min-height: auto;
             }
 
             .card-custom {
-                box-shadow: none;
-                border: none;
-                padding: 20px;
+                padding: 24px;
+                border-radius: 20px;
+            }
+
+            .message {
+                max-width: 90%;
             }
         }
     </style>
@@ -315,23 +786,34 @@
             <!-- Chat Section -->
             <div class="col-md-6 chat-section">
                 <div class="chat-header">
-                    <div class="bg-primary bg-opacity-10 p-2 rounded-circle text-primary">
-                        <i class="bi bi-robot fs-5"></i>
+                    <div class="chat-header-icon">
+                        <i class="bi bi-robot"></i>
                     </div>
-                    <h5>Mistral AI Asistan</h5>
+                    <div>
+                        <h5>Mistral AI Asistan</h5>
+                        <small style="color: rgba(255,255,255,0.8); font-size: 0.8rem;">Her zaman yardıma hazır</small>
+                    </div>
+                    <div class="status-dot" title="Çevrimiçi"></div>
                 </div>
 
                 <div id="chatBox" class="chat-box d-flex flex-column">
                     <div class="message bot-msg">
-                        Merhaba! Ben size yardımcı olmak için buradayım. Excel dosyanızla ilgili veya başka konularda
-                        sorular sorabilirsiniz.
+                        <div class="message-avatar">
+                            <i class="bi bi-robot"></i>
+                        </div>
+                        <div class="message-content">
+                            Merhaba! Ben size yardımcı olmak için buradayım. Excel dosyanızla ilgili veya başka
+                            konularda
+                            sorular sorabilirsiniz. 🚀
+                        </div>
                     </div>
                 </div>
 
                 <div class="chat-input-area">
                     <div class="chat-input-wrapper">
-                        <input type="text" id="chatInput" class="chat-input" placeholder="Bir şeyler yazın...">
-                        <button class="send-btn" onclick="sendMessage()">
+                        <input type="text" id="chatInput" class="chat-input" placeholder="Mesajınızı yazın..."
+                            aria-label="Mesaj girin">
+                        <button class="send-btn" onclick="sendMessage()" aria-label="Mesaj gönder" id="sendBtn">
                             <i class="bi bi-send-fill"></i>
                         </button>
                     </div>
@@ -341,39 +823,40 @@
             <!-- Upload Section -->
             <div class="col-md-6 upload-section">
                 <div class="card-custom">
-                    <div class="text-center mb-5">
-                        <h4 class="fw-bold text-dark">Excel Yükle & Mail Gönder</h4>
-                        <p class="text-secondary small">Kullanıcıları veritabanına ekleyin ve memnuniyet anketi gönderin
-                        </p>
+                    <div class="card-title-area">
+                        <div class="card-title-icon">
+                            <i class="bi bi-file-earmark-spreadsheet"></i>
+                        </div>
+                        <h4>Excel Yükle & Mail Gönder</h4>
+                        <p>Kullanıcıları veritabanına ekleyin ve memnuniyet anketi gönderin</p>
                     </div>
 
                     <!-- Excel Upload Area -->
                     <div class="mb-4">
                         <div class="file-upload-wrapper" id="dropZone">
-                            <input type="file" id="excelInput" accept=".xlsx, .xls" onchange="handleFileSelect(this)">
-                            <i class="bi bi-cloud-arrow-up upload-icon"></i>
-                            <span class="upload-text fw-medium">Dosya Seçin veya Sürükleyin</span>
-                            <div class="upload-text small mt-1 text-muted">.xlsx veya .xls formatı</div>
+                            <input type="file" id="excelInput" accept=".xlsx, .xls" onchange="handleFileSelect(this)"
+                                aria-label="Excel dosyası seç">
+                            <i class="bi bi-cloud-arrow-up upload-icon" id="uploadIcon"></i>
+                            <span class="upload-text" id="uploadText">Dosya seçin veya sürükleyip bırakın</span>
+                            <div class="upload-hint">.xlsx veya .xls formatı desteklenir</div>
                             <div id="fileName" class="file-name-display"></div>
                         </div>
 
                         <button onclick="uploadAndSendEmails()" class="btn action-btn w-100" id="uploadBtn">
-                            <i class="bi bi-send me-2"></i> Yükle ve Başlat
+                            <i class="bi bi-send-check me-2"></i>Yükle ve Mailleri Gönder
                         </button>
 
-                        <div id="statusResult" class="mt-3 text-center small"></div>
+                        <div id="statusResult" class="mt-3"></div>
                     </div>
 
-                    <hr class="my-4" style="opacity: 0.1">
+                    <div class="section-divider"></div>
 
                     <!-- Statistics Area -->
                     <div>
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6 class="fw-bold m-0"><i class="bi bi-bar-chart-line me-2 text-primary"></i>İstatistikler
-                            </h6>
-                            <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2">
-                                <span class="spinner-grow spinner-grow-sm me-1" role="status" aria-hidden="true"
-                                    style="width: 0.5rem; height: 0.5rem;"></span>
+                        <div class="stats-header">
+                            <h6><i class="bi bi-graph-up-arrow text-primary"></i> İstatistikler</h6>
+                            <span class="live-badge">
+                                <span class="live-dot"></span>
                                 Canlı Veri
                             </span>
                         </div>
@@ -388,31 +871,104 @@
     </div>
 
     <script>
-        // Dosya seçildiğinde ismi göster
+        // Dosya seçildiğinde
         function handleFileSelect(input) {
             const fileNameDiv = document.getElementById('fileName');
+            const uploadIcon = document.getElementById('uploadIcon');
+            const uploadText = document.getElementById('uploadText');
+            const dropZone = document.getElementById('dropZone');
+
             if (input.files && input.files[0]) {
-                fileNameDiv.innerHTML = `<i class="bi bi-file-earmark-excel me-1"></i> ${input.files[0].name}`;
-                document.querySelector('.upload-text').style.display = 'none';
-                document.querySelector('.upload-icon').className = 'bi bi-check-circle-fill upload-icon text-success';
+                fileNameDiv.innerHTML = `<i class="bi bi-file-earmark-excel-fill text-success"></i> ${input.files[0].name}`;
+                uploadText.style.display = 'none';
+                uploadIcon.className = 'bi bi-check-circle-fill upload-icon';
+                uploadIcon.style.color = '#10b981';
+                dropZone.classList.add('file-selected');
             } else {
-                fileNameDiv.textContent = '';
-                document.querySelector('.upload-text').style.display = 'block';
-                document.querySelector('.upload-icon').className = 'bi bi-cloud-arrow-up upload-icon';
+                resetFileUpload();
             }
         }
+
+        function resetFileUpload() {
+            const fileNameDiv = document.getElementById('fileName');
+            const uploadIcon = document.getElementById('uploadIcon');
+            const uploadText = document.getElementById('uploadText');
+            const dropZone = document.getElementById('dropZone');
+
+            fileNameDiv.textContent = '';
+            uploadText.style.display = 'block';
+            uploadIcon.className = 'bi bi-cloud-arrow-up upload-icon';
+            uploadIcon.style.color = '#94a3b8';
+            dropZone.classList.remove('file-selected');
+        }
+
+        // Drag & Drop
+        const dropZone = document.getElementById('dropZone');
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropZone.classList.add('drag-over');
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('drag-over');
+            });
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            if (files.length) {
+                document.getElementById('excelInput').files = files;
+                handleFileSelect(document.getElementById('excelInput'));
+            }
+        });
 
         // --- CHAT FONKSİYONU ---
         async function sendMessage() {
             const input = document.getElementById('chatInput');
             const chatBox = document.getElementById('chatBox');
+            const sendBtn = document.getElementById('sendBtn');
             const msg = input.value.trim();
 
             if (!msg) return;
 
             // Kullanıcı mesajını ekle
-            chatBox.innerHTML += `<div class="message user-msg">${msg}</div>`;
+            const userMsgHTML = `
+                <div class="message user-msg">
+                    <div class="message-avatar">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                    <div class="message-content">${escapeHtml(msg)}</div>
+                </div>
+            `;
+            chatBox.innerHTML += userMsgHTML;
             input.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Disable send button
+            sendBtn.disabled = true;
+
+            // Typing indicator ekle
+            const typingId = 'typing-' + Date.now();
+            const typingHTML = `
+                <div class="message bot-msg" id="${typingId}">
+                    <div class="message-avatar">
+                        <i class="bi bi-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        <div class="typing-indicator">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            chatBox.innerHTML += typingHTML;
             chatBox.scrollTop = chatBox.scrollHeight;
 
             try {
@@ -423,12 +979,41 @@
                 });
                 const data = await res.json();
 
+                // Typing indicator'ı kaldır
+                document.getElementById(typingId)?.remove();
+
                 // Bot cevabını ekle
-                chatBox.innerHTML += `<div class="message bot-msg">${data.reply}</div>`;
+                const botMsgHTML = `
+                    <div class="message bot-msg">
+                        <div class="message-avatar">
+                            <i class="bi bi-robot"></i>
+                        </div>
+                        <div class="message-content">${data.reply}</div>
+                    </div>
+                `;
+                chatBox.innerHTML += botMsgHTML;
                 chatBox.scrollTop = chatBox.scrollHeight;
             } catch (err) {
-                chatBox.innerHTML += `<div class="message bot-msg text-danger">Hata: Sunucuya ulaşılamadı.</div>`;
+                document.getElementById(typingId)?.remove();
+                chatBox.innerHTML += `
+                    <div class="message bot-msg">
+                        <div class="message-avatar">
+                            <i class="bi bi-robot"></i>
+                        </div>
+                        <div class="message-content" style="color: var(--danger-color);">
+                            <i class="bi bi-exclamation-triangle me-1"></i> Sunucuya ulaşılamadı. Lütfen tekrar deneyin.
+                        </div>
+                    </div>
+                `;
+            } finally {
+                sendBtn.disabled = false;
             }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
         // Enter tuşu ile gönderme
@@ -443,7 +1028,12 @@
             const btn = document.getElementById('uploadBtn');
 
             if (fileInput.files.length === 0) {
-                alert("Lütfen önce bir Excel dosyası seçin!");
+                statusDiv.innerHTML = `
+                    <div class="alert-custom alert-danger-custom d-flex align-items-center gap-2">
+                        <i class="bi bi-exclamation-circle"></i>
+                        Lütfen önce bir Excel dosyası seçin!
+                    </div>
+                `;
                 return;
             }
 
@@ -453,7 +1043,11 @@
             // UI Güncelleme (Yükleniyor...)
             btn.disabled = true;
             btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>İşleniyor...`;
-            statusDiv.innerHTML = '<span class="text-warning fw-medium">Veriler yükleniyor ve e-postalar gönderiliyor...</span>';
+            statusDiv.innerHTML = `
+                <div class="alert-custom" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); color: #92400e; border: 1px solid #fcd34d;">
+                    <i class="bi bi-hourglass-split me-2"></i> Veriler işleniyor ve e-postalar gönderiliyor...
+                </div>
+            `;
 
             try {
                 const res = await fetch('/api/upload-and-send-emails', {
@@ -463,39 +1057,57 @@
                 const data = await res.json();
 
                 if (res.ok) {
-                    // API zaten "✅ n kullanıcı..." şeklinde dönüyor mu kontrol etmeliyiz.
-                    // Eğer server tarafında emoji varsa burada tekrar koymayalım.
-                    let cleanMessage = data.message.replace(/✅/g, '').trim();
-
-                    let detailMsg = `<div class="alert alert-success border-0 bg-success bg-opacity-10 py-2">
-                        <i class="bi bi-check-circle-fill text-success me-2"></i><strong>İşlem Başarılı</strong>
-                    </div>`;
-
-                    detailMsg += `<div class="d-flex justify-content-between px-2 mt-3">`;
-                    detailMsg += `<div><span class="d-block text-muted small">Veritabanı</span><span class="fw-bold text-dark">${data.uploadSuccess} Eklendi</span></div>`;
-                    detailMsg += `<div class="text-end"><span class="d-block text-muted small">E-posta</span><span class="fw-bold text-dark">${data.emailSuccess} Gönderildi</span></div>`;
-                    detailMsg += `</div>`;
+                    let resultHTML = `
+                        <div class="alert-custom alert-success-custom mb-3">
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                            <strong>İşlem Başarıyla Tamamlandı!</strong>
+                        </div>
+                        <div class="row g-2 text-center">
+                            <div class="col-6">
+                                <div class="stat-item">
+                                    <div class="stat-label">Veritabanı</div>
+                                    <div class="stat-value text-primary">${data.uploadSuccess}</div>
+                                    <small class="text-muted">Eklendi</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="stat-item">
+                                    <div class="stat-label">E-posta</div>
+                                    <div class="stat-value text-info">${data.emailSuccess}</div>
+                                    <small class="text-muted">Gönderildi</small>
+                                </div>
+                            </div>
+                        </div>
+                    `;
 
                     if (data.uploadErrors > 0 || data.emailErrors > 0) {
-                        detailMsg += `<div class="alert alert-warning border-0 bg-warning bg-opacity-10 mt-3 py-2 small">
-                            ${data.uploadErrors + data.emailErrors} hata oluştu. Detaylar konsolda.
-                         </div>`;
+                        resultHTML += `
+                            <div class="alert-custom mt-3" style="background: #fef9c3; color: #854d0e; border: 1px solid #fde047;">
+                                <i class="bi bi-exclamation-triangle me-1"></i>
+                                ${data.uploadErrors + data.emailErrors} hata oluştu. Detaylar konsolda.
+                            </div>
+                        `;
                     }
 
-                    statusDiv.innerHTML = detailMsg;
-
-                    // İstatistikleri otomatik yenile
+                    statusDiv.innerHTML = resultHTML;
                     setTimeout(() => loadStats(), 1000);
                 } else {
-                    statusDiv.innerHTML = `<div class="alert alert-danger py-2"><i class="bi bi-exclamation-circle me-2"></i>${data.message}</div>`;
+                    statusDiv.innerHTML = `
+                        <div class="alert-custom alert-danger-custom">
+                            <i class="bi bi-x-circle me-2"></i>${data.message}
+                        </div>
+                    `;
                 }
             } catch (err) {
-                statusDiv.innerHTML = `<div class="alert alert-danger py-2"><i class="bi bi-x-circle me-2"></i>Sunucu hatası!</div>`;
+                statusDiv.innerHTML = `
+                    <div class="alert-custom alert-danger-custom">
+                        <i class="bi bi-x-circle me-2"></i>Sunucu hatası!
+                    </div>
+                `;
                 console.error(err);
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '<i class="bi bi-send me-2"></i> Yükle ve Başlat';
-                // fileInput.value = ''; // Yüklemeden sonra dosyayı temizlemek isteğe bağlı
+                btn.innerHTML = '<i class="bi bi-send-check me-2"></i>Yükle ve Mailleri Gönder';
             }
         }
 
@@ -503,9 +1115,14 @@
         async function loadStats() {
             const statsDisplay = document.getElementById('statsDisplay');
 
-            // İlk yüklemede loading göster (içi boşsa)
             if (!statsDisplay.innerHTML) {
-                statsDisplay.innerHTML = '<div class="text-center py-3"><span class="spinner-border spinner-border-sm text-primary"></span></div>';
+                statsDisplay.innerHTML = `
+                    <div class="stats-card text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Yükleniyor...</span>
+                        </div>
+                    </div>
+                `;
             }
 
             try {
@@ -513,77 +1130,84 @@
                 const data = await res.json();
 
                 if (res.ok) {
-                    const satisfactionColor = data.satisfactionRate >= 70 ? 'success' : data.satisfactionRate >= 40 ? 'warning' : 'danger';
-                    const satisfactionClass = data.satisfactionRate >= 70 ? '#10b981' : data.satisfactionRate >= 40 ? '#f59e0b' : '#ef4444';
+                    const ratingColors = {
+                        5: 'bg-success',
+                        4: 'bg-success bg-opacity-75',
+                        3: 'bg-warning',
+                        2: 'bg-danger bg-opacity-75',
+                        1: 'bg-danger'
+                    };
 
-                    statsDisplay.innerHTML = `
-                    <div class="stats-card">
-                        <div class="row g-3">
-                            <div class="col-6">
-                                <div class="stat-item bg-white rounded border border-light shadow-sm text-center">
-                                    <div class="stat-label">Toplam</div>
-                                    <div class="stat-value text-primary">${data.totalUsers}</div>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="stat-item bg-white rounded border border-light shadow-sm text-center">
-                                    <div class="stat-label">Gönderilen</div>
-                                    <div class="stat-value text-info">${data.emailsSent}</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 px-2">
-                            <div class="d-flex justify-content-between align-items-end mb-2">
-                                <span class="text-secondary fw-medium small">Ortalama Puan</span>
-                                <span class="fs-4 fw-bold text-dark"><span class="text-warning">★</span> ${data.averageScore}</span>
-                            </div>
-                            
-                            <!-- Puan Dağılımı -->
-                            <div class="rating-distribution mt-3">
-                                ${[5, 4, 3, 2, 1].map(score => {
+                    let distributionHTML = '';
+                    [5, 4, 3, 2, 1].forEach(score => {
                         const count = data.distribution ? data.distribution[score] : 0;
                         const percent = data.totalResponses > 0 ? (count / data.totalResponses * 100) : 0;
-                        const color = score >= 4 ? 'bg-success' : score === 3 ? 'bg-warning' : 'bg-danger';
-                        return `
-                                        <div class="d-flex align-items-center mb-1" style="font-size: 0.8rem;">
-                                            <span style="width: 20px;">${score}</span>
-                                            <div class="progress flex-grow-1 mx-2" style="height: 6px;">
-                                                <div class="progress-bar ${color}" role="progressbar" style="width: ${percent}%"></div>
-                                            </div>
-                                            <span class="text-muted" style="width: 30px; text-align: right;">${count}</span>
-                                        </div>
-                                    `;
-                    }).join('')}
+                        distributionHTML += `
+                            <div class="rating-row">
+                                <span class="score">${score}</span>
+                                <div class="bar-wrap">
+                                    <div class="progress-custom">
+                                        <div class="progress-bar ${ratingColors[score]}" style="width: ${percent}%"></div>
+                                    </div>
+                                </div>
+                                <span class="count">${count}</span>
+                            </div>
+                        `;
+                    });
+
+                    statsDisplay.innerHTML = `
+                        <div class="stats-card">
+                            <div class="row g-3 mb-4">
+                                <div class="col-6">
+                                    <div class="stat-item">
+                                        <div class="stat-label">Toplam</div>
+                                        <div class="stat-value text-primary">${data.totalUsers}</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="stat-item">
+                                        <div class="stat-label">Gönderilen</div>
+                                        <div class="stat-value text-info">${data.emailsSent}</div>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="text-end mt-2">
-                                <span class="text-muted" style="font-size: 0.75rem">Toplam ${data.totalResponses} değerlendirme</span>
+                            <div class="px-2">
+                                <div class="d-flex justify-content-between align-items-end mb-3">
+                                    <span class="text-secondary fw-semibold" style="font-size: 0.85rem;">Ortalama Puan</span>
+                                    <span class="fs-3 fw-bold">
+                                        <span style="color: #f59e0b;">★</span> ${data.averageScore}
+                                    </span>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    ${distributionHTML}
+                                </div>
+
+                                <div class="text-end">
+                                    <small class="text-muted">Toplam ${data.totalResponses} değerlendirme</small>
+                                </div>
+                            </div>
+
+                            <div class="text-center mt-4 pt-3 border-top">
+                                <button onclick="clearDatabase()" class="clear-db-btn btn btn-link">
+                                    <i class="bi bi-trash3"></i> Veritabanını Temizle
+                                </button>
                             </div>
                         </div>
-
-                        <div class="mt-4 pt-3 border-top text-center">
-                            <button onclick="clearDatabase()" class="btn btn-link text-danger text-decoration-none btn-sm" style="font-size: 0.8rem;">
-                                <i class="bi bi-trash"></i> Veritabanını Temizle (Sıfırla)
-                            </button>
-                        </div>
-                    </div>
-                `;
+                    `;
                 }
             } catch (err) {
                 console.error("İstatistik hatası:", err);
-                // Hata durumunda UI'ı bozma, sessizce geç (bir sonraki döngüde düzelir)
             }
         }
 
-        // REALTIME SSE BAĞLANTISI (Polling yerine)
+        // REALTIME SSE BAĞLANTISI
         function setupRealtimeListener() {
             const eventSource = new EventSource('/api/stats-stream');
 
             eventSource.onmessage = function (event) {
                 if (event.data === 'update') {
-                    // Veri değişti, istatistikleri yeniden çek
-                    //console.log('⚡ Canlı veri güncellemesi alındı');
                     loadStats();
                 }
             };
@@ -591,15 +1215,14 @@
             eventSource.onerror = function (err) {
                 console.error("SSE Bağlantı hatası, yeniden deneniyor...", err);
                 eventSource.close();
-                // 3 saniye sonra tekrar dene
                 setTimeout(setupRealtimeListener, 3000);
             };
         }
 
         // Sayfa yüklendiğinde başlat
         window.addEventListener('load', () => {
-            loadStats(); // İlk yükleme
-            setupRealtimeListener(); // Canlı dinleme başlat
+            loadStats();
+            setupRealtimeListener();
         });
 
         // --- VERİTABANINI TEMİZLE ---
@@ -608,7 +1231,7 @@
                 return;
             }
 
-            const btn = document.querySelector('button[onclick="clearDatabase()"]');
+            const btn = document.querySelector('.clear-db-btn');
             const originalText = btn.innerHTML;
             btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Siliniyor...';
             btn.disabled = true;
@@ -618,11 +1241,8 @@
                 const data = await res.json();
 
                 if (res.ok) {
-                    // Logları ve durumu temizle
-                    document.getElementById('uploadLog').innerHTML = '';
-                    document.getElementById('uploadStatus').innerHTML = '';
-
-                    loadStats(); // İstatistikleri yenile (sıfırla)
+                    document.getElementById('statusResult').innerHTML = '';
+                    loadStats();
                 } else {
                     alert('Hata: ' + data.message);
                 }
