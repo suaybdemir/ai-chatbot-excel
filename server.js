@@ -190,6 +190,9 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
                     };
                 });
 
+                // Not bölümü - eğer not varsa göster
+                const notSection = not !== '' ? true : false;
+
                 const htmlContent = `
                         <!DOCTYPE html>
                         <html>
