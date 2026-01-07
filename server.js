@@ -181,18 +181,14 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
                 const { id, name, surname, email, not } = user;
                 const fullName = `${name} ${surname}`.trim() || 'Değerli Kullanıcı';
 
-                // Memnuniyet butonları için linkler
-                const satisfiedLink = `${BASE_URL}/api/satisfaction-response?userId=${user.id}&response=1`;
-                const neutralLink = `${BASE_URL}/api/satisfaction-response?userId=${user.id}&response=2`;
-                const notSatisfiedLink = `${BASE_URL}/api/satisfaction-response?userId=${user.id}&response=0`;
-
-                // Not bölümü - eğer not varsa göster
-                const notSection = not !== '' ? `
-                    <div style="text-align: center; margin: 25px 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px;">
-                        <div style="color: rgba(255,255,255,0.8); font-size: 14px; margin-bottom: 5px;">Notunuz</div>
-                        <div style="color: white; font-size: 48px; font-weight: bold;">${not}</div>
-                    </div>
-                ` : '';
+                // Puanlama Linkleri (1-5)
+                const stars = [1, 2, 3, 4, 5];
+                const starLinks = stars.map(score => {
+                    return {
+                        score,
+                        url: `${BASE_URL}/api/satisfaction-response?userId=${user.id}&response=${score}`
+                    };
+                });
 
                 const htmlContent = `
                         <!DOCTYPE html>
@@ -200,54 +196,65 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
                         <head>
                             <meta charset="UTF-8">
                             <style>
-                                body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; }
-                                .container { max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
-                                .header { background: linear-gradient(135deg, #4f46e5 0%, #312e81 100%); padding: 40px 30px; text-align: center; color: white; }
-                                .header h1 { margin: 0; font-size: 24px; font-weight: 600; letter-spacing: 0.5px; }
-                                .header p { margin: 10px 0 0; opacity: 0.9; font-size: 14px; }
-                                .content { padding: 40px 30px; text-align: center; }
-                                h2 { color: #1e293b; margin-top: 0; font-size: 20px; }
-                                .text-body { color: #64748b; line-height: 1.6; margin-bottom: 30px; font-size: 15px; }
-                                .buttons { margin-top: 35px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
-                                .btn { display: inline-block; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px; transition: all 0.3s ease; }
-                                .btn-success { background-color: #10b981; color: white; border-bottom: 3px solid #059669; }
-                                .btn-danger { background-color: #ef4444; color: white; border-bottom: 3px solid #b91c1c; }
-                                .btn:hover { transform: translateY(-2px); filter: brightness(110%); }
-                                .grade-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; margin: 20px 0; color: #334155; font-weight: 500; }
-                                .footer { background-color: #f8fafc; padding: 20px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #e2e8f0; }
+                                body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #ffffff; color: #333333; margin: 0; padding: 0; line-height: 1.6; }
+                                .container { max-width: 600px; margin: 0 auto; padding: 40px 20px; text-align: left; }
+                                .header { margin-bottom: 30px; border-bottom: 2px solid #f3f4f6; padding-bottom: 20px; }
+                                h1 { font-size: 22px; font-weight: 700; margin: 0; color: #111827; }
+                                p { font-size: 16px; margin-bottom: 20px; color: #4b5563; }
+                                .rating-box { margin-top: 30px; padding: 20px 0; border-top: 1px solid #f3f4f6; border-bottom: 1px solid #f3f4f6; }
+                                .rating-label { font-weight: 600; font-size: 14px; margin-bottom: 15px; display: block; color: #111827; text-transform: uppercase; letter-spacing: 0.5px; }
+                                .stars { display: flex; gap: 10px; flex-wrap: wrap; }
+                                .star-btn { 
+                                    text-decoration: none; 
+                                    display: inline-flex; 
+                                    justify-content: center; 
+                                    align-items: center; 
+                                    width: 45px; 
+                                    height: 45px; 
+                                    border: 1px solid #e5e7eb; 
+                                    border-radius: 8px; 
+                                    color: #4b5563; 
+                                    font-weight: bold; 
+                                    font-size: 18px; 
+                                    transition: all 0.2s;
+                                    background: #ffffff;
+                                }
+                                .star-btn:hover { background-color: #f9fafb; border-color: #d1d5db; color: #111827; }
+                                .star-1:hover { background-color: #fee2e2; border-color: #fca5a5; color: #991b1b; } /* Kırmızımsı */
+                                .star-2:hover { background-color: #ffedd5; border-color: #fdba74; color: #9a3412; } /* Turuncumsu */
+                                .star-3:hover { background-color: #fef9c3; border-color: #fde047; color: #854d0e; } /* Sarımsı */
+                                .star-4:hover { background-color: #dcfce7; border-color: #86efac; color: #166534; } /* Yeşilimsi */
+                                .star-5:hover { background-color: #d1fae5; border-color: #6ee7b7; color: #065f46; } /* Koyu Yeşil */
+                                
+                                .footer { margin-top: 40px; font-size: 13px; color: #9ca3af; border-top: 1px solid #f3f4f6; padding-top: 20px; }
+                                .not-area { margin-bottom: 30px; font-style: italic; color: #4b5563; background: #f9fafb; padding: 15px; border-radius: 6px; border-left: 3px solid #d1d5db; }
                             </style>
                         </head>
                         <body>
                             <div class="container">
                                 <div class="header">
                                     <h1>Yüksek Trafikli Sistemlerde<br>AI Chatbot Geliştirme</h1>
-                                    <p>Eğitim Değerlendirme Anketi</p>
                                 </div>
-                                <div class="content">
-                                    <h2>Sayın ${fullName},</h2>
-                                    ${notSection ? `<div class="grade-box">${notSection}</div>` : ''}
-                                    <p class="text-body">
-                                        Eğitimimize katılımınız için teşekkür ederiz. Eğitim kalitemizi sürekli artırmak ve sizlere daha iyi bir öğrenme deneyimi sunmak adına görüşleriniz bizim için çok değerli.
-                                    </p>
-                                    <p class="text-body" style="font-weight: 500; color: #334155;">
-                                        Bu dersin size kattıkları ve genel işleyiş hakkında ne düşünüyorsunuz?
-                                    </p>
-                                    
-                                    <div class="buttons">
-                                        <a href="${satisfiedLink}" class="btn btn-success">
-                                            🚀 Harikaydı
-                                        </a>
-                                        <a href="${neutralLink}" class="btn" style="background-color: #64748b; color: white; border-bottom: 3px solid #475569;">
-                                            🤔 Fena Değil
-                                        </a>
-                                        <a href="${notSatisfiedLink}" class="btn btn-danger">
-                                            👎 Beğenmedim
-                                        </a>
+                                
+                                <p>Sayın <strong>${fullName}</strong>,</p>
+                                
+                                ${notSection ? `<div class="not-area">"${not}"</div>` : ''}
+                                
+                                <p>Eğitimimize katılımınız için teşekkür ederiz. Kalitemizi artırmak için görüşleriniz bizim için çok önemli.</p>
+                                <p>Lütfen eğitimi 1'den 5'e kadar puanlayın:</p>
+                                
+                                <div class="rating-box">
+                                    <span class="rating-label">Dersi Puanlayın</span>
+                                    <div class="stars">
+                                        ${starLinks.map(s => `
+                                            <a href="${s.url}" class="star-btn star-${s.score}">${s.score}</a>
+                                        `).join('')}
+                                        <span style="display:flex; align-items:center; margin-left:10px; font-size:12px; color:#9ca3af;">(1: Kötü, 5: Mükemmel)</span>
                                     </div>
                                 </div>
+                                
                                 <div class="footer">
-                                    <p>© 2026 AI Chatbot Academy. Tüm hakları saklıdır.</p>
-                                    <p>Bu e-posta otomatik olarak gönderilmiştir. Lütfen cevaplamayınız.</p>
+                                    <p>© 2026 AI Chatbot Academy<br>Bu mesaj otomatik olarak gönderilmiştir.</p>
                                 </div>
                             </div>
                         </body>
@@ -332,9 +339,11 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
 // C) MEMNUNİYET CEVABI
 app.get('/api/satisfaction-response', async (req, res) => {
     const { userId, response } = req.query;
+    const score = parseInt(response);
 
-    if (!userId || (response !== '0' && response !== '1' && response !== '2')) {
-        return res.status(400).send('Geçersiz istek.');
+    // 1-5 arası puan kontrolü
+    if (!userId || isNaN(score) || score < 1 || score > 5) {
+        return res.status(400).send('Geçersiz istek. Puan 1 ile 5 arasında olmalıdır.');
     }
 
     try {
@@ -342,36 +351,19 @@ app.get('/api/satisfaction-response', async (req, res) => {
         const { error } = await supabase
             .from('users')
             .update({
-                satisfaction_response: parseInt(response),
+                satisfaction_response: score,
                 satisfaction_response_at: new Date().toISOString()
             })
             .eq('id', parseInt(userId));
 
         if (error) throw error;
 
-        const responseInt = parseInt(response);
-        let statusText = '';
-        if (responseInt === 1) statusText = 'Memnun';
-        else if (responseInt === 2) statusText = 'Kararsız';
-        else statusText = 'Memnun Değil';
-
-        console.log(`✅ Kullanıcı #${userId} cevabı kaydedildi: ${statusText}`);
+        console.log(`✅ Kullanıcı #${userId} puan verdi: ${score}/5`);
 
         // TÜM İSTEMCİLERE BİLDİR (REALTIME UPDATE)
         notifyClients();
 
         // Teşekkür sayfası
-        let emoji = '😊';
-        let message = 'Memnun kaldığınızı duyduğumuza çok sevindik!';
-
-        if (responseInt === 2) {
-            emoji = '🤔';
-            message = 'Geri bildiriminiz için teşekkürler. Daha iyisini yapabilmek için çalışacağız.';
-        } else if (responseInt === 0) {
-            emoji = '😔';
-            message = 'Geri bildiriminiz için teşekkürler. Eksiklerimizi gidermek için çalışacağız.';
-        }
-
         res.send(`
             <!DOCTYPE html>
             <html>
@@ -379,18 +371,19 @@ app.get('/api/satisfaction-response', async (req, res) => {
                 <meta charset="UTF-8">
                 <title>Teşekkürler</title>
                 <style>
-                    body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; }
-                    .thank-you { background: white; padding: 50px; border-radius: 20px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-width: 500px; }
-                    .emoji { font-size: 80px; margin-bottom: 20px; }
-                    h1 { color: #333; margin-bottom: 20px; }
-                    p { color: #666; font-size: 18px; line-height: 1.6; }
+                    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f9fafb; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+                    .card { background: white; padding: 40px; border-radius: 16px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); max-width: 400px; width: 90%; }
+                    .score { font-size: 64px; font-weight: 800; color: #3b82f6; margin: 20px 0; }
+                    h1 { color: #111827; margin-bottom: 10px; font-size: 24px; }
+                    p { color: #6b7280; margin-bottom: 0; }
                 </style>
             </head>
             <body>
-                <div class="thank-you">
-                    <div class="emoji">${emoji}</div>
+                <div class="card">
                     <h1>Teşekkürler!</h1>
-                    <p>${message}</p>
+                    <div class="score">${score}</div>
+                    <p>Puanınız (${score}/5) başarıyla kaydedildi.</p>
+                    <p style="margin-top:20px; font-size:12px; color:#9ca3af;">AI Chatbot Academy</p>
                 </div>
             </body>
             </html>
@@ -497,28 +490,33 @@ app.get('/api/satisfaction-stats', async (req, res) => {
         // satisfaction_response null değilse bir cevap vardır
         const totalResponses = users.filter(u => u.satisfaction_response != null).length;
 
-        // Loose equality (==) kullanarak string/number/boolean farkını yoksay
-        const satisfiedCount = users.filter(u => u.satisfaction_response == 1).length;
-        const neutralCount = users.filter(u => u.satisfaction_response == 2).length;
-        const notSatisfiedCount = users.filter(u => u.satisfaction_response == 0).length;
+        // Ortalama Puan Hesaplama
+        const responses = users.filter(u => u.satisfaction_response != null).map(u => u.satisfaction_response);
+        const totalScore = responses.reduce((acc, score) => acc + score, 0);
+        const averageScore = totalResponses > 0 ? (totalScore / totalResponses).toFixed(1) : '0.0';
+
+        // Puan Dağılımı (1-5)
+        const distribution = {
+            1: responses.filter(s => s == 1).length,
+            2: responses.filter(s => s == 2).length,
+            3: responses.filter(s => s == 3).length,
+            4: responses.filter(s => s == 4).length,
+            5: responses.filter(s => s == 5).length
+        };
 
         // Debug log
         if (totalResponses > 0) {
-            console.log(`📊 Stats Debug: Total:${totalResponses}, Happy:${satisfiedCount}, Neutral:${neutralCount}, Sad:${notSatisfiedCount}`);
+            console.log(`📊 Stats Debug: Avg:${averageScore}, Dist:${JSON.stringify(distribution)}`);
         }
 
         res.json({
             totalUsers: totalUsers,
             emailsSent: emailsSent,
             totalResponses: totalResponses,
-            satisfiedCount: satisfiedCount,
-            neutralCount: neutralCount,
-            notSatisfiedCount: notSatisfiedCount,
+            averageScore: averageScore,
+            distribution: distribution,
             responseRate: emailsSent > 0
                 ? ((totalResponses / emailsSent) * 100).toFixed(1)
-                : '0.0',
-            satisfactionRate: totalResponses > 0
-                ? (((satisfiedCount + (neutralCount * 0.5)) / totalResponses) * 100).toFixed(1)
                 : '0.0'
         });
 
