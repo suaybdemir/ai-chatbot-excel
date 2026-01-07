@@ -114,62 +114,46 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
 
         console.log(`📊 Excel dosyası okundu. ${data.length} satır bulundu.`);
 
+        // Sütun ismi eşleştirme yardımcı fonksiyonu
+        const findColumnValue = (row, possibleNames) => {
+            // Satırdaki tüm sütun isimlerini al
+            const rowKeys = Object.keys(row);
+
+            // Her olası isim için kontrol et
+            for (const name of possibleNames) {
+                // Tam eşleşme
+                if (row[name] !== undefined) return row[name];
+
+                // Normalize edilmiş eşleşme (lowercase, trim)
+                const normalizedName = name.toLowerCase().trim();
+                for (const key of rowKeys) {
+                    if (key.toLowerCase().trim() === normalizedName) {
+                        return row[key];
+                    }
+                }
+            }
+            return null;
+        };
+
+        // Olası sütun isimleri
+        const adColumns = ['Ad', 'ad', 'AD', 'Adı', 'adı', 'ADI', 'İsim', 'isim', 'İSİM', 'Name', 'name', 'NAME', 'First Name', 'FirstName', 'firstname', 'First_Name', 'first_name', 'Öğrenci Adı', 'öğrenci adı', 'Ogrenci Adi', 'Kullanıcı Adı'];
+        const soyadColumns = ['Soyad', 'soyad', 'SOYAD', 'Soyadı', 'soyadı', 'SOYADI', 'Surname', 'surname', 'SURNAME', 'Last Name', 'LastName', 'lastname', 'Last_Name', 'last_name', 'Family Name', 'Öğrenci Soyadı'];
+        const emailColumns = ['Email', 'email', 'EMAIL', 'E-mail', 'e-mail', 'E-MAIL', 'E-posta', 'e-posta', 'E-POSTA', 'Eposta', 'eposta', 'Mail', 'mail', 'MAIL', 'Email Address', 'Mail Adresi', 'Öğrenci Email', 'Öğrenci Mail'];
+        const notColumns = ['Not', 'not', 'NOT', 'Notu', 'notu', 'NOTU', 'Ders Notu', 'ders notu', 'Puan', 'puan', 'PUAN', 'Puanı', 'puanı', 'Grade', 'grade', 'GRADE', 'Score', 'score', 'Point', 'point', 'Points', 'Mark', 'mark', 'Marks', 'Final', 'final', 'Vize', 'vize', 'Ortalama', 'ortalama', 'Değerlendirme', 'Başarı Puanı'];
+
+        // İlk satırın sütun isimlerini logla
+        if (data.length > 0) {
+            console.log(`📋 Excel sütunları: ${Object.keys(data[0]).join(', ')}`);
+        }
+
         // İlk aşama: Veritabanına kaydet veya mevcut kullanıcıyı al
         for (const row of data) {
-            // Ad alanı - Türkçe ve İngilizce varyasyonlar
-            const ad = row['Ad'] || row['ad'] || row['AD'] ||
-                row['Adı'] || row['adı'] || row['ADI'] ||
-                row['İsim'] || row['isim'] || row['İSİM'] ||
-                row['Name'] || row['name'] || row['NAME'] ||
-                row['First Name'] || row['first name'] || row['FirstName'] || row['firstname'] ||
-                row['First_Name'] || row['first_name'] ||
-                row['Öğrenci Adı'] || row['öğrenci adı'] || row['Ogrenci Adi'] ||
-                row['Kullanıcı Adı'] || row['kullanıcı adı'] ||
-                '';
+            const ad = findColumnValue(row, adColumns) || '';
+            const soyad = findColumnValue(row, soyadColumns) || '';
+            const email = findColumnValue(row, emailColumns);
+            const not = findColumnValue(row, notColumns);
 
-            // Soyad alanı - Türkçe ve İngilizce varyasyonlar  
-            const soyad = row['Soyad'] || row['soyad'] || row['SOYAD'] ||
-                row['Soyadı'] || row['soyadı'] || row['SOYADI'] ||
-                row['Surname'] || row['surname'] || row['SURNAME'] ||
-                row['Last Name'] || row['last name'] || row['LastName'] || row['lastname'] ||
-                row['Last_Name'] || row['last_name'] ||
-                row['Family Name'] || row['family name'] ||
-                row['Öğrenci Soyadı'] || row['öğrenci soyadı'] ||
-                '';
-
-            // Email alanı - Tüm varyasyonlar
-            const email = row['Email'] || row['email'] || row['EMAIL'] ||
-                row['E-mail'] || row['e-mail'] || row['E-MAIL'] ||
-                row['E-posta'] || row['e-posta'] || row['E-POSTA'] ||
-                row['Eposta'] || row['eposta'] || row['EPOSTA'] ||
-                row['Mail'] || row['mail'] || row['MAIL'] ||
-                row['E Mail'] || row['e mail'] ||
-                row['Email Address'] || row['email address'] ||
-                row['Mail Adresi'] || row['mail adresi'] ||
-                row['Öğrenci Email'] || row['öğrenci email'] ||
-                row['Öğrenci Mail'] || row['öğrenci mail'] ||
-                '';
-
-            // Not/Puan alanı - Türkçe, İngilizce ve akademik terimler
-            const not = row['Not'] || row['not'] || row['NOT'] ||
-                row['Notu'] || row['notu'] || row['NOTU'] ||
-                row['Ders Notu'] || row['ders notu'] || row['DERS NOTU'] ||
-                row['Puan'] || row['puan'] || row['PUAN'] ||
-                row['Puanı'] || row['puanı'] || row['PUANI'] ||
-                row['Grade'] || row['grade'] || row['GRADE'] ||
-                row['Score'] || row['score'] || row['SCORE'] ||
-                row['Point'] || row['point'] || row['POINT'] ||
-                row['Points'] || row['points'] || row['POINTS'] ||
-                row['Mark'] || row['mark'] || row['MARK'] ||
-                row['Marks'] || row['marks'] || row['MARKS'] ||
-                row['Final'] || row['final'] || row['FINAL'] ||
-                row['Final Notu'] || row['final notu'] ||
-                row['Vize'] || row['vize'] || row['VIZE'] ||
-                row['Ortalama'] || row['ortalama'] || row['ORTALAMA'] ||
-                row['Genel Puan'] || row['genel puan'] ||
-                row['Değerlendirme'] || row['değerlendirme'] ||
-                row['Başarı Puanı'] || row['başarı puanı'] ||
-                '';
+            console.log(`🔍 Satır: ad="${ad}", soyad="${soyad}", email="${email}", not="${not}"`);
 
             if (email) {
                 try {
