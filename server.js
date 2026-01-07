@@ -9,9 +9,14 @@ const fs = require('fs');
 // SDK'yı yeni sürüme uygun çağırıyoruz:
 const { Mistral } = require('@mistralai/mistralai');
 
+// Port ve Base URL ayarları (Hugging Face Spaces için)
+const PORT = process.env.PORT || 7860;
+const BASE_URL = process.env.SPACE_HOST ? `https://${process.env.SPACE_HOST}` : `http://localhost:${PORT}`;
+
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.static(__dirname));
 
 // --- AYARLAR ---
 
@@ -91,11 +96,12 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
 
         console.log(`📊 Excel dosyası okundu. ${data.length} satır bulundu.`);
 
-        // İlk aşama: Veritabanına kaydet
+        // İlk aşama: Veritabanına kaydet veya mevcut kullanıcıyı al
         for (const row of data) {
             const ad = row['Ad'] || row['name'] || '';
             const soyad = row['Soyad'] || row['surname'] || '';
             const email = row['Email'] || row['email'];
+            const not = row['Not'] || row['not'] || row['Puan'] || row['puan'] || row['Grade'] || row['grade'] || '';
 
             if (email) {
                 try {
@@ -104,19 +110,43 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
                         .insert([{ name: ad, surname: soyad, email: email }])
                         .select();
 
-                    if (error) throw error;
+                    if (error) {
+                        // Duplicate key hatası - mevcut kullanıcıyı al
+                        if (error.code === '23505' || error.message.includes('duplicate')) {
+                            console.log(`ℹ️ Mevcut kullanıcı: ${email} - mail gönderilecek.`);
 
-                    console.log(`✅ DB: ${ad} ${soyad} (${email}) kaydedildi.`);
+                            // Mevcut kullanıcıyı veritabanından al
+                            const { data: existingUser, error: fetchError } = await supabase
+                                .from('users')
+                                .select('*')
+                                .eq('email', email)
+                                .single();
 
-                    // Eklenen kullanıcıyı kaydet
-                    addedUsers.push({
-                        id: insertedData[0].id,
-                        name: ad,
-                        surname: soyad,
-                        email: email
-                    });
+                            if (!fetchError && existingUser) {
+                                addedUsers.push({
+                                    id: existingUser.id,
+                                    name: existingUser.name || ad,
+                                    surname: existingUser.surname || soyad,
+                                    email: email,
+                                    not: not
+                                });
+                            }
+                        } else {
+                            throw error;
+                        }
+                    } else {
+                        console.log(`✅ DB: ${ad} ${soyad} (${email}) - Not: ${not} kaydedildi.`);
+                        uploadSuccessCount++;
 
-                    uploadSuccessCount++;
+                        // Eklenen kullanıcıyı kaydet
+                        addedUsers.push({
+                            id: insertedData[0].id,
+                            name: ad,
+                            surname: soyad,
+                            email: email,
+                            not: not
+                        });
+                    }
                 } catch (error) {
                     console.error(`❌ DB Hatası (${email}):`, error.message);
                     uploadErrors.push(`${email}: ${error.message}`);
@@ -133,20 +163,28 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
 
         // İkinci aşama: Eklenen kullanıcılara mail gönder
         if (addedUsers.length > 0) {
-            console.log(`📧 ${addedUsers.length} kullanıcıya memnuniyet anketi gönderiliyor...`);
+            console.log(`📧 ${addedUsers.length} kullanıcıya not bildirimi gönderiliyor...`);
 
             for (const user of addedUsers) {
-                const { id, name, surname, email } = user;
+                const { id, name, surname, email, not } = user;
                 const fullName = `${name} ${surname}`.trim() || 'Değerli Kullanıcı';
 
                 // Memnuniyet butonları için linkler
-                const satisfiedLink = `http://localhost:3000/api/satisfaction-response?userId=${id}&response=1`;
-                const notSatisfiedLink = `http://localhost:3000/api/satisfaction-response?userId=${id}&response=0`;
+                const satisfiedLink = `${BASE_URL}/api/satisfaction-response?userId=${id}&response=1`;
+                const notSatisfiedLink = `${BASE_URL}/api/satisfaction-response?userId=${id}&response=0`;
+
+                // Not bölümü - eğer not varsa göster
+                const notSection = not !== '' ? `
+                    <div style="text-align: center; margin: 25px 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px;">
+                        <div style="color: rgba(255,255,255,0.8); font-size: 14px; margin-bottom: 5px;">Notunuz</div>
+                        <div style="color: white; font-size: 48px; font-weight: bold;">${not}</div>
+                    </div>
+                ` : '';
 
                 const mailOptions = {
                     from: process.env.EMAIL_USER,
                     to: email,
-                    subject: 'Hizmetimizden Memnun Musunuz?',
+                    subject: not !== '' ? `Notunuz: ${not} - Hizmetimizden Memnun Musunuz?` : 'Hizmetimizden Memnun Musunuz?',
                     html: `
                         <!DOCTYPE html>
                         <html>
@@ -167,6 +205,7 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
                         <body>
                             <div class="container">
                                 <h2>Merhaba ${fullName},</h2>
+                                ${notSection}
                                 <p>Hizmetimizden memnuniyetinizi öğrenmek isteriz. Lütfen aşağıdaki butonlardan birini seçerek görüşünüzü bizimle paylaşın:</p>
                                 
                                 <div class="buttons">
@@ -382,9 +421,9 @@ app.get('/api/satisfaction-stats', async (req, res) => {
     }
 });
 
-app.listen(3000, () => {
+app.listen(PORT, () => {
     console.log('------------------------------------------------');
-    console.log('🚀 Server çalışıyor: http://localhost:3000');
+    console.log(`🚀 Server çalışıyor: ${BASE_URL}`);
     console.log('🤖 Mistral AI: SDK v1.x Aktif');
     console.log('💾 Supabase: PostgreSQL Database Aktif');
     console.log('------------------------------------------------');

@@ -152,7 +152,7 @@
             // Botun 'yazıyor...' durumunu simüle edebiliriz (opsiyonel)
 
             try {
-                const res = await fetch('http://localhost:3000/api/chat', {
+                const res = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: msg })
@@ -192,7 +192,7 @@
             statusDiv.innerHTML = '<span class="text-warning">Veriler işleniyor...</span>';
 
             try {
-                const res = await fetch('http://localhost:3000/api/upload', {
+                const res = await fetch('/api/upload', {
                     method: 'POST',
                     body: formData
                 });
@@ -232,7 +232,7 @@
             statusDiv.innerHTML = '<span class="text-warning">📊 Veriler yükleniyor ve e-postalar gönderiliyor...</span>';
 
             try {
-                const res = await fetch('http://localhost:3000/api/upload-and-send-emails', {
+                const res = await fetch('/api/upload-and-send-emails', {
                     method: 'POST',
                     body: formData
                 });
@@ -274,7 +274,7 @@
             surveyResult.innerHTML = '<span class="text-warning">E-postalar gönderiliyor...</span>';
 
             try {
-                const res = await fetch('http://localhost:3000/api/send-satisfaction-emails', {
+                const res = await fetch('/api/send-satisfaction-emails', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' }
                 });
@@ -305,7 +305,7 @@
             statsDisplay.innerHTML = '<div class="text-center"><span class="text-muted">İstatistikler yükleniyor...</span></div>';
 
             try {
-                const res = await fetch('http://localhost:3000/api/satisfaction-stats');
+                const res = await fetch('/api/satisfaction-stats');
                 const data = await res.json();
 
                 if (res.ok) {

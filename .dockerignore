@@ -1,0 +1,13 @@
+node_modules
+.env
+.env.*
+uploads
+*.log
+.git
+.gitignore
+.DS_Store
+README.md
+KURULUM.md
+SONRAKI_ADIMLAR.md
+test_data.csv
+*.sql
