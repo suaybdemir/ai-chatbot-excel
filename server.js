@@ -190,29 +190,52 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
                         <head>
                             <meta charset="UTF-8">
                             <style>
-                                body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }
-                                .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-                                h2 { color: #333; margin-bottom: 20px; }
-                                p { color: #666; line-height: 1.6; }
-                                .buttons { text-align: center; margin-top: 30px; }
-                                .btn { display: inline-block; padding: 15px 40px; margin: 10px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 16px; }
-                                .btn-success { background-color: #28a745; color: white; }
-                                .btn-danger { background-color: #dc3545; color: white; }
-                                .btn:hover { opacity: 0.9; }
+                                body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; }
+                                .container { max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+                                .header { background: linear-gradient(135deg, #4f46e5 0%, #312e81 100%); padding: 40px 30px; text-align: center; color: white; }
+                                .header h1 { margin: 0; font-size: 24px; font-weight: 600; letter-spacing: 0.5px; }
+                                .header p { margin: 10px 0 0; opacity: 0.9; font-size: 14px; }
+                                .content { padding: 40px 30px; text-align: center; }
+                                h2 { color: #1e293b; margin-top: 0; font-size: 20px; }
+                                .text-body { color: #64748b; line-height: 1.6; margin-bottom: 30px; font-size: 15px; }
+                                .buttons { margin-top: 35px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+                                .btn { display: inline-block; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px; transition: all 0.3s ease; }
+                                .btn-success { background-color: #10b981; color: white; border-bottom: 3px solid #059669; }
+                                .btn-danger { background-color: #ef4444; color: white; border-bottom: 3px solid #b91c1c; }
+                                .btn:hover { transform: translateY(-2px); filter: brightness(110%); }
+                                .grade-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; margin: 20px 0; color: #334155; font-weight: 500; }
+                                .footer { background-color: #f8fafc; padding: 20px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #e2e8f0; }
                             </style>
                         </head>
                         <body>
                             <div class="container">
-                                <h2>Merhaba ${fullName},</h2>
-                                ${notSection}
-                                <p>Hizmetimizden memnuniyetinizi öğrenmek isteriz. Lütfen aşağıdaki butonlardan birini seçerek görüşünüzü bizimle paylaşın:</p>
-                                
-                                <div class="buttons">
-                                    <a href="${satisfiedLink}" class="btn btn-success">😊 Memnunum</a>
-                                    <a href="${notSatisfiedLink}" class="btn btn-danger">😞 Memnun Değilim</a>
+                                <div class="header">
+                                    <h1>Yüksek Trafikli Sistemlerde<br>AI Chatbot Geliştirme</h1>
+                                    <p>Eğitim Değerlendirme Anketi</p>
                                 </div>
-                                
-                                <p style="margin-top: 30px; font-size: 14px; color: #999;">Geri bildiriminiz bizim için çok değerli. Teşekkür ederiz!</p>
+                                <div class="content">
+                                    <h2>Sayın ${fullName},</h2>
+                                    ${notSection ? `<div class="grade-box">${notSection}</div>` : ''}
+                                    <p class="text-body">
+                                        Eğitimimize katılımınız için teşekkür ederiz. Eğitim kalitemizi sürekli artırmak ve sizlere daha iyi bir öğrenme deneyimi sunmak adına görüşleriniz bizim için çok değerli.
+                                    </p>
+                                    <p class="text-body" style="font-weight: 500; color: #334155;">
+                                        Bu dersin size kattıkları ve genel işleyiş hakkında ne düşünüyorsunuz?
+                                    </p>
+                                    
+                                    <div class="buttons">
+                                        <a href="${satisfiedLink}" class="btn btn-success">
+                                            🚀 Dersi Beğendim
+                                        </a>
+                                        <a href="${notSatisfiedLink}" class="btn btn-danger">
+                                            💡 Geliştirilmeli
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="footer">
+                                    <p>© 2026 AI Chatbot Academy. Tüm hakları saklıdır.</p>
+                                    <p>Bu e-posta otomatik olarak gönderilmiştir. Lütfen cevaplamayınız.</p>
+                                </div>
                             </div>
                         </body>
                         </html>
@@ -227,7 +250,7 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
                                 {
                                     "From": {
                                         "Email": EMAIL_FROM,
-                                        "Name": EMAIL_FROM_NAME
+                                        "Name": "AI Chatbot Academy"
                                     },
                                     "To": [
                                         {
@@ -235,13 +258,14 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
                                             "Name": fullName
                                         }
                                     ],
-                                    "Subject": not !== '' ? `Notunuz: ${not} - Hizmetimizden Memnun Musunuz?` : 'Hizmetimizden Memnun Musunuz?',
+                                    "Subject": `Ders Değerlendirmesi: Yüksek Trafikli Sistemlerde AI Chatbot`,
                                     "HTMLPart": htmlContent
                                 }
                             ]
                         });
 
-                    console.log(`📨 Mailjet Yanıtı (${email}):`, result.body.Messages[0].Status);
+                    // Status check (Mailjet bazen success dönse de kuyrukta bekleyebilir)
+                    // console.log(`📨 Mailjet Yanıtı (${email}):`, result.body.Messages[0].Status);
 
                     // Veritabanını güncelle
                     const { error } = await supabase
