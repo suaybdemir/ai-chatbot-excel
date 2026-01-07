@@ -206,31 +206,46 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
                                 p { font-size: 16px; margin-bottom: 20px; color: #4b5563; }
                                 .rating-box { margin-top: 30px; padding: 20px 0; border-top: 1px solid #f3f4f6; border-bottom: 1px solid #f3f4f6; }
                                 .rating-label { font-weight: 600; font-size: 14px; margin-bottom: 15px; display: block; color: #111827; text-transform: uppercase; letter-spacing: 0.5px; }
-                                .stars { display: flex; gap: 10px; flex-wrap: wrap; }
+                                .stars { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; } /* Gap artırıldı, ortalandı */
                                 .star-btn { 
                                     text-decoration: none; 
                                     display: inline-flex; 
                                     justify-content: center; 
                                     align-items: center; 
-                                    width: 45px; 
-                                    height: 45px; 
-                                    border: 1px solid #e5e7eb; 
-                                    border-radius: 8px; 
+                                    width: 55px; /* Büyütüldü (Mobil için rahat tıklama) */
+                                    height: 55px; 
+                                    border: 2px solid #e5e7eb; /* Çerçeve kalınlaştırıldı */
+                                    border-radius: 12px; 
                                     color: #4b5563; 
-                                    font-weight: bold; 
-                                    font-size: 18px; 
+                                    font-weight: 800; 
+                                    font-size: 22px; /* Rakam büyütüldü */
                                     transition: all 0.2s;
                                     background: #ffffff;
+                                    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
                                 }
-                                .star-btn:hover { background-color: #f9fafb; border-color: #d1d5db; color: #111827; }
-                                .star-1:hover { background-color: #fee2e2; border-color: #fca5a5; color: #991b1b; } /* Kırmızımsı */
-                                .star-2:hover { background-color: #ffedd5; border-color: #fdba74; color: #9a3412; } /* Turuncumsu */
-                                .star-3:hover { background-color: #fef9c3; border-color: #fde047; color: #854d0e; } /* Sarımsı */
-                                .star-4:hover { background-color: #dcfce7; border-color: #86efac; color: #166534; } /* Yeşilimsi */
-                                .star-5:hover { background-color: #d1fae5; border-color: #6ee7b7; color: #065f46; } /* Koyu Yeşil */
+                                .star-btn:hover { background-color: #f9fafb; border-color: #9ca3af; color: #111827; transform: translateY(-2px); }
+                                .star-1:hover { background-color: #fee2e2; border-color: #ef4444; color: #7f1d1d; } 
+                                .star-2:hover { background-color: #ffedd5; border-color: #f97316; color: #7c2d12; } 
+                                .star-3:hover { background-color: #fef9c3; border-color: #eab308; color: #713f12; } 
+                                .star-4:hover { background-color: #dcfce7; border-color: #22c55e; color: #14532d; } 
+                                .star-5:hover { background-color: #d1fae5; border-color: #10b981; color: #064e3b; } 
                                 
-                                .footer { margin-top: 40px; font-size: 13px; color: #9ca3af; border-top: 1px solid #f3f4f6; padding-top: 20px; }
-                                .not-area { margin-bottom: 30px; font-style: italic; color: #4b5563; background: #f9fafb; padding: 15px; border-radius: 6px; border-left: 3px solid #d1d5db; }
+                                .footer { margin-top: 40px; font-size: 13px; color: #9ca3af; border-top: 1px solid #f3f4f6; padding-top: 20px; text-align: center; }
+                                
+                                /* Not Alanı İyileştirmesi */
+                                .not-area { 
+                                    margin-bottom: 30px; 
+                                    font-style: normal; /* İtalik kalktı, daha okunaklı */
+                                    color: #1f2937; 
+                                    background: #f3f4f6; 
+                                    padding: 25px; 
+                                    border-radius: 12px; 
+                                    border-left: 5px solid #3b82f6; /* Mavi bar belirginleştirildi */
+                                    font-size: 24px; /* Not boyutu ciddi şekilde büyütüldü */
+                                    font-weight: 700;
+                                    text-align: center;
+                                    letter-spacing: 0.5px;
+                                }
                             </style>
                         </head>
                         <body>
