@@ -286,35 +286,36 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
                                 
                                 /* Puanlama Bölümü */
                                 .rating-section {
-                                    background: #f8fafc;
-                                    border-radius: 16px;
-                                    padding: 28px;
+                                    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+                                    border-radius: 20px;
+                                    padding: 36px 24px;
                                     text-align: center;
                                 }
                                 .rating-title { 
                                     font-weight: 700; 
-                                    font-size: 15px; 
-                                    margin-bottom: 20px; 
-                                    color: #111827;
+                                    font-size: 20px; 
+                                    margin-bottom: 24px; 
+                                    color: white;
                                 }
                                 .stars-row { 
                                     display: flex; 
                                     justify-content: center;
-                                    gap: 10px; 
+                                    gap: 12px; 
                                     flex-wrap: wrap;
-                                    margin-bottom: 12px;
+                                    margin-bottom: 16px;
                                 }
                                 .star-btn { 
                                     text-decoration: none; 
                                     display: inline-block;
-                                    width: 52px; 
-                                    height: 52px;
-                                    line-height: 52px;
+                                    width: 80px; 
+                                    height: 80px;
+                                    line-height: 80px;
                                     text-align: center;
-                                    border-radius: 12px; 
-                                    font-weight: 700; 
-                                    font-size: 18px;
+                                    border-radius: 16px; 
+                                    font-weight: 800; 
+                                    font-size: 32px;
                                     color: white;
+                                    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
                                 }
                                 .star-1 { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
                                 .star-2 { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); }
@@ -322,8 +323,9 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
                                 .star-4 { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); }
                                 .star-5 { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
                                 .rating-hint {
-                                    font-size: 12px;
-                                    color: #9ca3af;
+                                    font-size: 14px;
+                                    color: rgba(255,255,255,0.8);
+                                    margin-top: 8px;
                                 }
                                 
                                 .footer { 
@@ -355,11 +357,11 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
                                 <p class="message">Eğitimimize katılımınız için teşekkür ederiz. Kalitemizi artırmak için görüşleriniz bizim için çok değerli.</p>
                                 
                                 <div class="rating-section">
-                                    <div class="rating-title">📊 Eğitimi Puanlayın</div>
+                                    <div class="rating-title">⭐ Eğitimi Puanlayın</div>
                                     <div class="stars-row">
-                                        ${starLinks.map(s => `<a href="${s.url}" class="star-btn star-${s.score}">${'★'.repeat(s.score)}</a>`).join('')}
+                                        ${starLinks.map(s => `<a href="${s.url}" class="star-btn star-${s.score}">${s.score}</a>`).join('')}
                                     </div>
-                                    <div class="rating-hint">1 yıldız: Kötü → 5 yıldız: Mükemmel</div>
+                                    <div class="rating-hint">1: Kötü → 5: Mükemmel</div>
                                 </div>
                                 
                                 <div class="footer">
