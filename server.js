@@ -435,9 +435,18 @@ app.get('/api/satisfaction-stats', async (req, res) => {
         // İstatistikleri hesapla
         const totalUsers = users.length;
         const emailsSent = users.filter(u => u.satisfaction_sent === true).length;
-        const totalResponses = users.filter(u => u.satisfaction_response !== null).length;
-        const satisfiedCount = users.filter(u => u.satisfaction_response === 1).length;
-        const notSatisfiedCount = users.filter(u => u.satisfaction_response === 0).length;
+
+        // satisfaction_response null değilse bir cevap vardır
+        const totalResponses = users.filter(u => u.satisfaction_response != null).length;
+
+        // Loose equality (==) kullanarak string/number/boolean farkını yoksay
+        const satisfiedCount = users.filter(u => u.satisfaction_response == 1).length;
+        const notSatisfiedCount = users.filter(u => u.satisfaction_response == 0).length;
+
+        // Debug log
+        if (totalResponses > 0) {
+            console.log(`📊 Stats Debug: Total:${totalResponses}, Happy:${satisfiedCount}, Sad:${notSatisfiedCount}`);
+        }
 
         res.json({
             totalUsers: totalUsers,
