@@ -237,7 +237,7 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
                                         <a href="${satisfiedLink}" class="btn btn-success">
                                             🚀 Harikaydı
                                         </a>
-                                        <a href="${neutralLink}" class="btn" style="background-color: #f59e0b; color: white; border-bottom: 3px solid #d97706;">
+                                        <a href="${neutralLink}" class="btn" style="background-color: #64748b; color: white; border-bottom: 3px solid #475569;">
                                             🤔 Fena Değil
                                         </a>
                                         <a href="${notSatisfiedLink}" class="btn btn-danger">
