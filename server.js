@@ -254,8 +254,10 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
                     };
                 });
 
-                // Not bölümü - eğer not varsa göster
-                const notSection = not !== '' ? true : false;
+                // Not bölümü - eğer not varsa göster (0 dahil tüm değerler)
+                const notValue = not !== undefined && not !== null && not !== '' ? String(not) : null;
+                const notSection = notValue !== null;
+                console.log(`📋 Kullanıcı: ${fullName}, Not değeri: "${not}", notSection: ${notSection}, notValue: "${notValue}"`);
 
                 const htmlContent = `
                         <!DOCTYPE html>
@@ -421,7 +423,7 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
                                 ${notSection ? `
                                 <div class="grade-card">
                                     <div class="grade-label">Ders Notunuz</div>
-                                    <div class="grade-value">${not}</div>
+                                    <div class="grade-value">${notValue}</div>
                                 </div>
                                 ` : ''}
                                 
