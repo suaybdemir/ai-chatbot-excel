@@ -404,6 +404,24 @@ app.get('/api/vote', async (req, res) => {
     }
 });
 
+// F) VERİTABANI TEMİZLE (Sadece Demo/Test Amaçlı)
+app.post('/api/clear-database', async (req, res) => {
+    try {
+        const { error } = await supabase
+            .from('users')
+            .delete()
+            .neq('id', 0); // Tüm satırları sil (id != 0)
+
+        if (error) throw error;
+
+        console.log('⚠️ Veritabanı temizlendi.');
+        res.json({ message: 'Veritabanı başarıyla temizlendi.' });
+    } catch (error) {
+        console.error('❌ Temizleme hatası:', error);
+        res.status(500).json({ message: 'Veritabanı temizlenemedi.' });
+    }
+});
+
 // E) İSTATİSTİKLER
 app.get('/api/satisfaction-stats', async (req, res) => {
     try {
