@@ -253,69 +253,76 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
                                     margin-bottom: 24px;
                                 }
                                 
-                                /* Puan Kartı */
+                                /* Puan Kartı - Daha büyük mobil uyumlu */
                                 .grade-card { 
                                     background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-                                    border: 2px solid #7dd3fc;
-                                    border-radius: 16px;
-                                    padding: 24px;
+                                    border: 3px solid #7dd3fc;
+                                    border-radius: 24px;
+                                    padding: 36px 32px;
                                     text-align: center;
-                                    margin-bottom: 28px;
+                                    margin-bottom: 32px;
                                 }
                                 .grade-label {
-                                    font-size: 13px;
+                                    font-size: 16px;
                                     color: #0369a1;
-                                    font-weight: 600;
+                                    font-weight: 700;
                                     text-transform: uppercase;
-                                    letter-spacing: 1px;
-                                    margin-bottom: 8px;
+                                    letter-spacing: 1.5px;
+                                    margin-bottom: 12px;
                                 }
                                 .grade-value {
-                                    font-size: 42px;
+                                    font-size: 72px;
                                     font-weight: 800;
                                     color: #0284c7;
-                                    line-height: 1;
+                                    line-height: 1.1;
+                                    padding: 16px;
+                                    background: rgba(255,255,255,0.7);
+                                    border-radius: 16px;
+                                    display: inline-block;
+                                    min-width: 120px;
                                 }
                                 
                                 .message { 
-                                    font-size: 15px; 
+                                    font-size: 16px; 
                                     color: #4b5563; 
-                                    margin-bottom: 28px;
+                                    margin-bottom: 32px;
                                     text-align: center;
                                 }
                                 
-                                /* Puanlama Bölümü */
+                                /* Puanlama Bölümü - Büyük parmaklar için optimize edildi */
                                 .rating-section {
                                     background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-                                    border-radius: 20px;
-                                    padding: 36px 24px;
+                                    border-radius: 24px;
+                                    padding: 40px 20px;
                                     text-align: center;
                                 }
                                 .rating-title { 
                                     font-weight: 700; 
-                                    font-size: 20px; 
-                                    margin-bottom: 24px; 
+                                    font-size: 22px; 
+                                    margin-bottom: 28px; 
                                     color: white;
                                 }
                                 .stars-row { 
                                     display: flex; 
                                     justify-content: center;
-                                    gap: 12px; 
+                                    gap: 24px; 
                                     flex-wrap: wrap;
-                                    margin-bottom: 16px;
+                                    margin-bottom: 20px;
                                 }
                                 .star-btn { 
                                     text-decoration: none; 
-                                    display: inline-block;
-                                    width: 80px; 
-                                    height: 80px;
-                                    line-height: 80px;
+                                    display: inline-flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    width: 100px; 
+                                    height: 100px;
                                     text-align: center;
-                                    border-radius: 16px; 
+                                    border-radius: 20px; 
                                     font-weight: 800; 
-                                    font-size: 32px;
+                                    font-size: 40px;
                                     color: white;
-                                    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+                                    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+                                    transition: transform 0.2s;
                                 }
                                 .star-1 { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
                                 .star-2 { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); }
