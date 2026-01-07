@@ -233,7 +233,24 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
                 };
 
                 try {
-                    await transporter.sendMail(mailOptions);
+                    // Email gönderimi için timeout ekle
+                    const sendWithTimeout = new Promise((resolve, reject) => {
+                        const timeout = setTimeout(() => {
+                            reject(new Error('Email gönderim timeout (15 saniye)'));
+                        }, 15000);
+
+                        transporter.sendMail(mailOptions)
+                            .then(result => {
+                                clearTimeout(timeout);
+                                resolve(result);
+                            })
+                            .catch(err => {
+                                clearTimeout(timeout);
+                                reject(err);
+                            });
+                    });
+
+                    await sendWithTimeout;
 
                     // Veritabanını güncelle
                     const { error } = await supabase
