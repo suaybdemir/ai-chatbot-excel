@@ -531,16 +531,25 @@
                                     <div class="stat-value text-info">${data.emailsSent}</div>
                                 </div>
                             </div>
-                             <div class="col-6">
+                        </div>
+
+                        <div class="row g-2 mt-2">
+                             <div class="col-4">
                                 <div class="stat-item bg-white rounded border border-light shadow-sm text-center">
-                                    <div class="stat-label">😊 Memnun</div>
-                                    <div class="stat-value text-success">${data.satisfiedCount}</div>
+                                    <div class="stat-label">🚀</div>
+                                    <div class="stat-value text-success" style="font-size: 1.1rem">${data.satisfiedCount}</div>
                                 </div>
                             </div>
-                            <div class="col-6">
+                             <div class="col-4">
                                 <div class="stat-item bg-white rounded border border-light shadow-sm text-center">
-                                    <div class="stat-label">😞 Memnun Değil</div>
-                                    <div class="stat-value text-danger">${data.notSatisfiedCount}</div>
+                                    <div class="stat-label">🤔</div>
+                                    <div class="stat-value text-warning" style="font-size: 1.1rem">${data.neutralCount || 0}</div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-item bg-white rounded border border-light shadow-sm text-center">
+                                    <div class="stat-label">👎</div>
+                                    <div class="stat-value text-danger" style="font-size: 1.1rem">${data.notSatisfiedCount}</div>
                                 </div>
                             </div>
                         </div>
