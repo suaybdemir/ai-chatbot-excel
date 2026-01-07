@@ -10,14 +10,23 @@ const fs = require('fs');
 const { Mistral } = require('@mistralai/mistralai');
 
 // Port ve Base URL ayarları (Railway ve Hugging Face Spaces için)
-const PORT = process.env.PORT || 7860;
+const port = process.env.PORT || 7860;
 const BASE_URL = process.env.RAILWAY_PUBLIC_DOMAIN
     ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`
     : process.env.SPACE_HOST
         ? `https://${process.env.SPACE_HOST}`
-        : `http://localhost:${PORT}`;
+        : `http://localhost:${port}`;
 
 const app = express();
+
+// SSE Clients (Bağlı kullanıcılar)
+let sseClients = [];
+
+// SSE Bildirim Fonksiyonu
+const notifyClients = () => {
+    sseClients.forEach(client => client.res.write(`data: update\n\n`));
+};
+
 app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
@@ -311,6 +320,9 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
             totalErrors: [...uploadErrors, ...emailErrors]
         });
 
+        // Veritabanı değiştiği için bildirim gönder
+        if (uploadSuccessCount > 0) notifyClients();
+
     } catch (error) {
         console.error('❌ Sunucu hatası:', error);
         res.status(500).json({ message: 'Sunucu hatası oluştu: ' + error.message });
@@ -344,6 +356,9 @@ app.get('/api/satisfaction-response', async (req, res) => {
         else statusText = 'Memnun Değil';
 
         console.log(`✅ Kullanıcı #${userId} cevabı kaydedildi: ${statusText}`);
+
+        // TÜM İSTEMCİLERE BİLDİR (REALTIME UPDATE)
+        notifyClients();
 
         // Teşekkür sayfası
         let emoji = '😊';
@@ -457,6 +472,7 @@ app.post('/api/clear-database', async (req, res) => {
         if (error) throw error;
 
         console.log('⚠️ Veritabanı temizlendi.');
+        notifyClients(); // Temizlenince de bildir
         res.json({ message: 'Veritabanı başarıyla temizlendi.' });
     } catch (error) {
         console.error('❌ Temizleme hatası:', error);
@@ -508,11 +524,32 @@ app.get('/api/satisfaction-stats', async (req, res) => {
 
     } catch (error) {
         console.error('❌ İstatistik hatası:', error);
-        res.status(500).json({ message: 'İstatistikler alınamadı.' });
+        res.status(500).json({ message: 'Hata oluştu' });
     }
 });
 
-app.listen(PORT, '0.0.0.0', () => {
+// G) REALTIME STREAM (SSE Endpoint)
+app.get('/api/stats-stream', (req, res) => {
+    // SSE Headerları
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    // Client'ı listeye ekle
+    const clientId = Date.now();
+    const newClient = {
+        id: clientId,
+        res
+    };
+    sseClients.push(newClient);
+
+    // Bağlantı kapandığında listeden çıkar
+    req.on('close', () => {
+        sseClients = sseClients.filter(c => c.id !== clientId);
+    });
+});
+
+app.listen(port, '0.0.0.0', () => {
     console.log('------------------------------------------------');
     console.log(`🚀 Server çalışıyor: ${BASE_URL}`);
     console.log('🤖 Mistral AI: SDK v1.x Aktif');

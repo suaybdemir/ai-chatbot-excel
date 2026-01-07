@@ -581,10 +581,30 @@
             }
         }
 
-        // Sayfa yüklendiğinde başlat ve periyodik olarak güncelle
+        // REALTIME SSE BAĞLANTISI (Polling yerine)
+        function setupRealtimeListener() {
+            const eventSource = new EventSource('/api/stats-stream');
+
+            eventSource.onmessage = function (event) {
+                if (event.data === 'update') {
+                    // Veri değişti, istatistikleri yeniden çek
+                    //console.log('⚡ Canlı veri güncellemesi alındı');
+                    loadStats();
+                }
+            };
+
+            eventSource.onerror = function (err) {
+                console.error("SSE Bağlantı hatası, yeniden deneniyor...", err);
+                eventSource.close();
+                // 3 saniye sonra tekrar dene
+                setTimeout(setupRealtimeListener, 3000);
+            };
+        }
+
+        // Sayfa yüklendiğinde başlat
         window.addEventListener('load', () => {
-            loadStats();
-            setInterval(loadStats, 5000); // 5 saniyede bir güncelle
+            loadStats(); // İlk yükleme
+            setupRealtimeListener(); // Canlı dinleme başlat
         });
 
         // --- VERİTABANINI TEMİZLE ---
