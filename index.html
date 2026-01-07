@@ -618,10 +618,13 @@
                 const data = await res.json();
 
                 if (res.ok) {
-                    alert('✅ Veritabanı temizlendi.');
-                    loadStats();
+                    // Logları ve durumu temizle
+                    document.getElementById('uploadLog').innerHTML = '';
+                    document.getElementById('uploadStatus').innerHTML = '';
+
+                    loadStats(); // İstatistikleri yenile (sıfırla)
                 } else {
-                    alert('❌ Hata: ' + data.message);
+                    alert('Hata: ' + data.message);
                 }
             } catch (err) {
                 alert('❌ Sunucu hatası!');
