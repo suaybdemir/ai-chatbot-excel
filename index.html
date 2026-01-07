@@ -5,77 +5,274 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Chat & Excel Mailer</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
     <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --secondary-color: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+        }
+
         body {
-            background-color: #f8f9fa;
+            background-color: #f1f5f9;
             height: 100vh;
+            font-family: 'Inter', sans-serif;
             overflow: hidden;
+            color: var(--text-primary);
         }
 
         .main-row {
             height: 100%;
         }
 
-        /* Sol Taraf */
+        /* Sol Taraf - Chat */
         .chat-section {
             background: white;
             display: flex;
             flex-direction: column;
             height: 100%;
-            border-right: 1px solid #ddd;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .chat-header {
+            background: white;
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-header h5 {
+            font-weight: 600;
+            margin: 0;
+            color: var(--text-primary);
         }
 
         .chat-box {
             flex: 1;
             overflow-y: auto;
-            padding: 20px;
-            background: #fff;
+            padding: 24px;
+            background: #ffffff;
+            scroll-behavior: smooth;
         }
 
         .message {
-            margin-bottom: 15px;
-            padding: 10px 15px;
-            border-radius: 15px;
-            max-width: 80%;
+            margin-bottom: 16px;
+            padding: 12px 18px;
+            border-radius: 18px;
+            max-width: 85%;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            position: relative;
         }
 
         .user-msg {
-            background-color: #0d6efd;
+            background-color: var(--primary-color);
             color: white;
             align-self: flex-end;
             margin-left: auto;
+            border-bottom-right-radius: 4px;
         }
 
         .bot-msg {
-            background-color: #e9ecef;
-            color: #333;
+            background-color: #f1f5f9;
+            color: var(--text-primary);
             align-self: flex-start;
+            border-bottom-left-radius: 4px;
         }
 
         .chat-input-area {
             padding: 20px;
-            border-top: 1px solid #ddd;
-            background: #f8f9fa;
+            border-top: 1px solid var(--border-color);
+            background: white;
         }
 
-        /* Sağ Taraf */
+        .chat-input-wrapper {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 50px;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .chat-input {
+            border: none;
+            background: transparent;
+            padding: 10px 20px;
+            flex: 1;
+            outline: none;
+        }
+
+        .send-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .send-btn:hover {
+            background: var(--primary-hover);
+            transform: scale(1.05);
+        }
+
+        /* Sağ Taraf - Upload */
         .upload-section {
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100%;
-            background: #eef2f5;
+            background: #f8fafc;
+            padding: 20px;
+            overflow-y: auto;
         }
 
         .card-custom {
-            width: 80%;
-            max-width: 500px;
-            padding: 30px;
+            width: 100%;
+            max-width: 550px;
+            padding: 40px;
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 24px;
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-color);
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-upload-wrapper {
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            background: #f8fafc;
+            margin-bottom: 20px;
+        }
+
+        .file-upload-wrapper:hover {
+            border-color: var(--primary-color);
+            background: #eff6ff;
+        }
+
+        .file-upload-wrapper input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-icon {
+            font-size: 2rem;
+            color: #94a3b8;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .upload-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .file-name-display {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 12px;
+            border-radius: 12px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        .action-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+        }
+        
+        .action-btn:disabled {
+            background: #cbd5e1;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .stats-card {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-item {
+            padding: 10px;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .progress-bar-custom {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e2e8f0;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+
+        @media (max-width: 768px) {
+            body { overflow: auto; height: auto; }
+            .chat-section { height: 600px; border-right: none; border-bottom: 1px solid var(--border-color); }
+            .upload-section { padding: 10px; background: white; }
+            .card-custom { box-shadow: none; border: none; padding: 20px; }
         }
     </style>
 </head>
@@ -85,48 +282,68 @@
     <div class="container-fluid main-row p-0">
         <div class="row g-0 h-100">
 
+            <!-- Chat Section -->
             <div class="col-md-6 chat-section">
-                <div class="p-3 border-bottom bg-primary text-white">
-                    <h5 class="m-0">🤖 Mistral AI Chatbot</h5>
+                <div class="chat-header">
+                    <div class="bg-primary bg-opacity-10 p-2 rounded-circle text-primary">
+                        <i class="bi bi-robot fs-5"></i>
+                    </div>
+                    <h5>Mistral AI Asistan</h5>
                 </div>
+                
                 <div id="chatBox" class="chat-box d-flex flex-column">
-                    <div class="message bot-msg">Merhaba! Ben Mistral Tiny. Sana nasıl yardımcı olabilirim?</div>
+                    <div class="message bot-msg">
+                        Merhaba! Ben size yardımcı olmak için buradayım. Excel dosyanızla ilgili veya başka konularda sorular sorabilirsiniz.
+                    </div>
                 </div>
-                <div class="chat-input-area input-group">
-                    <input type="text" id="chatInput" class="form-control" placeholder="Sorunu yaz...">
-                    <button class="btn btn-primary" onclick="sendMessage()">Gönder</button>
+                
+                <div class="chat-input-area">
+                    <div class="chat-input-wrapper">
+                        <input type="text" id="chatInput" class="chat-input" placeholder="Bir şeyler yazın...">
+                        <button class="send-btn" onclick="sendMessage()">
+                            <i class="bi bi-send-fill"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
+            <!-- Upload Section -->
             <div class="col-md-6 upload-section">
-                <div class="card-custom text-center">
-                    <h3 class="mb-4">📁 Excel Yükle & Memnuniyet Anketi</h3>
-
-                    <!-- Excel Yükleme ve Mail Gönderme - TEK BUTON -->
-                    <div class="mb-4">
-                        <h5 class="text-muted mb-3">📊 Kullanıcı Ekle ve Mail Gönder</h5>
-                        <p class="text-muted small mb-3">
-                            Excel dosyasında <strong>Ad, Soyad, Email</strong> sütunları bulunmalıdır.<br>
-                            Kullanıcılar veritabanına eklenecek ve hemen memnuniyet anketi gönderilecektir.
-                        </p>
-
-                        <input type="file" id="excelInput" class="form-control mb-3" accept=".xlsx, .xls">
-                        <button onclick="uploadAndSendEmails()" class="btn btn-success w-100 py-2 mb-2" id="uploadBtn">
-                            📤 Yükle, Kaydet ve Tümüne Mail Gönder
-                        </button>
-                        <div id="statusResult" class="mt-2 fw-bold"></div>
+                <div class="card-custom">
+                    <div class="text-center mb-5">
+                        <h4 class="fw-bold text-dark">Excel Yükle & Mail Gönder</h4>
+                        <p class="text-secondary small">Kullanıcıları veritabanına ekleyin ve memnuniyet anketi gönderin</p>
                     </div>
 
+                    <!-- Excel Upload Area -->
+                    <div class="mb-4">
+                        <div class="file-upload-wrapper" id="dropZone">
+                            <input type="file" id="excelInput" accept=".xlsx, .xls" onchange="handleFileSelect(this)">
+                            <i class="bi bi-cloud-arrow-up upload-icon"></i>
+                            <span class="upload-text fw-medium">Dosya Seçin veya Sürükleyin</span>
+                            <div class="upload-text small mt-1 text-muted">.xlsx veya .xls formatı</div>
+                            <div id="fileName" class="file-name-display"></div>
+                        </div>
 
-                    <hr class="my-4">
-
-                    <!-- İstatistikler -->
-                    <div>
-                        <h5 class="text-muted mb-3">📊 Memnuniyet İstatistikleri</h5>
-                        <button onclick="loadStats()" class="btn btn-outline-secondary w-100 py-2 mb-3" id="statsBtn">
-                            🔄 İstatistikleri Yenile
+                        <button onclick="uploadAndSendEmails()" class="btn action-btn w-100" id="uploadBtn">
+                            <i class="bi bi-send me-2"></i> Yükle ve Başlat
                         </button>
-                        <div id="statsDisplay" class="text-start"></div>
+                        
+                        <div id="statusResult" class="mt-3 text-center small"></div>
+                    </div>
+
+                    <hr class="my-4" style="opacity: 0.1">
+
+                    <!-- Statistics Area -->
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="fw-bold m-0"><i class="bi bi-bar-chart-line me-2 text-primary"></i>İstatistikler</h6>
+                            <button onclick="loadStats()" class="btn btn-light btn-sm rounded-pill px-3" id="statsBtn">
+                                <i class="bi bi-arrow-clockwise"></i> Yenile
+                            </button>
+                        </div>
+                        
+                        <div id="statsDisplay"></div>
                     </div>
 
                 </div>
@@ -136,6 +353,20 @@
     </div>
 
     <script>
+        // Dosya seçildiğinde ismi göster
+        function handleFileSelect(input) {
+            const fileNameDiv = document.getElementById('fileName');
+            if (input.files && input.files[0]) {
+                fileNameDiv.innerHTML = `<i class="bi bi-file-earmark-excel me-1"></i> ${input.files[0].name}`;
+                document.querySelector('.upload-text').style.display = 'none';
+                document.querySelector('.upload-icon').className = 'bi bi-check-circle-fill upload-icon text-success';
+            } else {
+                fileNameDiv.textContent = '';
+                document.querySelector('.upload-text').style.display = 'block';
+                document.querySelector('.upload-icon').className = 'bi bi-cloud-arrow-up upload-icon';
+            }
+        }
+
         // --- CHAT FONKSİYONU ---
         async function sendMessage() {
             const input = document.getElementById('chatInput');
@@ -148,8 +379,6 @@
             chatBox.innerHTML += `<div class="message user-msg">${msg}</div>`;
             input.value = '';
             chatBox.scrollTop = chatBox.scrollHeight;
-
-            // Botun 'yazıyor...' durumunu simüle edebiliriz (opsiyonel)
 
             try {
                 const res = await fetch('/api/chat', {
@@ -172,47 +401,7 @@
             if (e.key === 'Enter') sendMessage();
         });
 
-        // --- EXCEL UPLOAD FONKSİYONU (ESKİ VERSİYON - Sadece DB'ye kaydet) ---
-        async function uploadExcel() {
-            const fileInput = document.getElementById('excelInput');
-            const statusDiv = document.getElementById('statusResult');
-            const btn = document.getElementById('uploadBtn');
-
-            if (fileInput.files.length === 0) {
-                alert("Lütfen önce bir Excel dosyası seçin!");
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append('file', fileInput.files[0]);
-
-            // UI Güncelleme (Yükleniyor...)
-            btn.disabled = true;
-            btn.innerText = "İşleniyor...";
-            statusDiv.innerHTML = '<span class="text-warning">Veriler işleniyor...</span>';
-
-            try {
-                const res = await fetch('/api/upload', {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await res.json();
-
-                if (res.ok) {
-                    statusDiv.innerHTML = `<span class="text-success">✅ ${data.message}</span>`;
-                } else {
-                    statusDiv.innerHTML = `<span class="text-danger">❌ Hata: ${data.message}</span>`;
-                }
-            } catch (err) {
-                statusDiv.innerHTML = `<span class="text-danger">❌ Sunucu hatası!</span>`;
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "📤 Yükle ve Veritabanına Ekle";
-                fileInput.value = ''; // Inputu temizle
-            }
-        }
-
-        // --- YENİ: EXCEL YÜKLE VE TÜM MAILLERI GÖNDER ---
+        // --- EXCEL YÜKLE VE TÜM MAILLERI GÖNDER ---
         async function uploadAndSendEmails() {
             const fileInput = document.getElementById('excelInput');
             const statusDiv = document.getElementById('statusResult');
@@ -228,8 +417,8 @@
 
             // UI Güncelleme (Yükleniyor...)
             btn.disabled = true;
-            btn.innerText = "⏳ İşleniyor (Yükleme + E-posta)...";
-            statusDiv.innerHTML = '<span class="text-warning">📊 Veriler yükleniyor ve e-postalar gönderiliyor...</span>';
+            btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>İşleniyor...`;
+            statusDiv.innerHTML = '<span class="text-warning fw-medium">Veriler yükleniyor ve e-postalar gönderiliyor...</span>';
 
             try {
                 const res = await fetch('/api/upload-and-send-emails', {
@@ -239,59 +428,39 @@
                 const data = await res.json();
 
                 if (res.ok) {
-                    let detailMsg = `<div class="text-success">✅ ${data.message}</div>`;
-                    detailMsg += `<div class="text-muted small mt-2">`;
-                    detailMsg += `📊 Veritabanı: ${data.uploadSuccess} eklendi`;
-                    if (data.uploadErrors > 0) detailMsg += ` (${data.uploadErrors} hata)`;
-                    detailMsg += `<br>`;
-                    detailMsg += `📧 E-posta: ${data.emailSuccess} gönderildi`;
-                    if (data.emailErrors > 0) detailMsg += ` (${data.emailErrors} hata)`;
+                    // API zaten "✅ n kullanıcı..." şeklinde dönüyor mu kontrol etmeliyiz.
+                    // Eğer server tarafında emoji varsa burada tekrar koymayalım.
+                    let cleanMessage = data.message.replace(/✅/g, '').trim(); 
+                    
+                    let detailMsg = `<div class="alert alert-success border-0 bg-success bg-opacity-10 py-2">
+                        <i class="bi bi-check-circle-fill text-success me-2"></i><strong>İşlem Başarılı</strong>
+                    </div>`;
+                    
+                    detailMsg += `<div class="d-flex justify-content-between px-2 mt-3">`;
+                    detailMsg += `<div><span class="d-block text-muted small">Veritabanı</span><span class="fw-bold text-dark">${data.uploadSuccess} Eklendi</span></div>`;
+                    detailMsg += `<div class="text-end"><span class="d-block text-muted small">E-posta</span><span class="fw-bold text-dark">${data.emailSuccess} Gönderildi</span></div>`;
                     detailMsg += `</div>`;
+
+                    if (data.uploadErrors > 0 || data.emailErrors > 0) {
+                         detailMsg += `<div class="alert alert-warning border-0 bg-warning bg-opacity-10 mt-3 py-2 small">
+                            ${data.uploadErrors + data.emailErrors} hata oluştu. Detaylar konsolda.
+                         </div>`;
+                    }
+
                     statusDiv.innerHTML = detailMsg;
 
                     // İstatistikleri otomatik yenile
                     setTimeout(() => loadStats(), 1000);
                 } else {
-                    statusDiv.innerHTML = `<span class="text-danger">❌ Hata: ${data.message}</span>`;
+                    statusDiv.innerHTML = `<div class="alert alert-danger py-2"><i class="bi bi-exclamation-circle me-2"></i>${data.message}</div>`;
                 }
             } catch (err) {
-                statusDiv.innerHTML = `<span class="text-danger">❌ Sunucu hatası!</span>`;
+                statusDiv.innerHTML = `<div class="alert alert-danger py-2"><i class="bi bi-x-circle me-2"></i>Sunucu hatası!</div>`;
                 console.error(err);
             } finally {
                 btn.disabled = false;
-                btn.innerText = "📤 Yükle, Kaydet ve Tümüne Mail Gönder";
-                fileInput.value = ''; // Inputu temizle
-            }
-        }
-
-        // --- MEMNUNİYET ANKETİ GÖNDERME ---
-        async function sendSatisfactionEmails() {
-            const surveyBtn = document.getElementById('surveyBtn');
-            const surveyResult = document.getElementById('surveyResult');
-
-            surveyBtn.disabled = true;
-            surveyBtn.innerText = "Gönderiliyor...";
-            surveyResult.innerHTML = '<span class="text-warning">E-postalar gönderiliyor...</span>';
-
-            try {
-                const res = await fetch('/api/send-satisfaction-emails', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                const data = await res.json();
-
-                if (res.ok) {
-                    surveyResult.innerHTML = `<span class="text-success">✅ ${data.message}</span>`;
-                    // İstatistikleri otomatik yenile
-                    setTimeout(() => loadStats(), 1000);
-                } else {
-                    surveyResult.innerHTML = `<span class="text-danger">❌ Hata: ${data.message}</span>`;
-                }
-            } catch (err) {
-                surveyResult.innerHTML = `<span class="text-danger">❌ Sunucu hatası!</span>`;
-            } finally {
-                surveyBtn.disabled = false;
-                surveyBtn.innerText = "✉️ Tüm Kullanıcılara Mail Gönder";
+                btn.innerHTML = '<i class="bi bi-send me-2"></i> Yükle ve Başlat';
+                // fileInput.value = ''; // Yüklemeden sonra dosyayı temizlemek isteğe bağlı
             }
         }
 
@@ -301,8 +470,7 @@
             const statsBtn = document.getElementById('statsBtn');
 
             statsBtn.disabled = true;
-            statsBtn.innerText = "Yükleniyor...";
-            statsDisplay.innerHTML = '<div class="text-center"><span class="text-muted">İstatistikler yükleniyor...</span></div>';
+            statsBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
 
             try {
                 const res = await fetch('/api/satisfaction-stats');
@@ -310,59 +478,59 @@
 
                 if (res.ok) {
                     const satisfactionColor = data.satisfactionRate >= 70 ? 'success' : data.satisfactionRate >= 40 ? 'warning' : 'danger';
+                    const satisfactionClass = data.satisfactionRate >= 70 ? '#10b981' : data.satisfactionRate >= 40 ? '#f59e0b' : '#ef4444';
 
                     statsDisplay.innerHTML = `
-                    <div class="card border-0 bg-light p-3">
-                        <div class="row g-2">
+                    <div class="stats-card">
+                        <div class="row g-3">
                             <div class="col-6">
-                                <div class="small text-muted">Toplam Kullanıcı</div>
-                                <div class="fs-4 fw-bold text-primary">${data.totalUsers}</div>
-                            </div>
-                            <div class="col-6">
-                                <div class="small text-muted">E-posta Gönderildi</div>
-                                <div class="fs-4 fw-bold text-info">${data.emailsSent}</div>
-                            </div>
-                            <div class="col-6">
-                                <div class="small text-muted">Cevap Sayısı</div>
-                                <div class="fs-4 fw-bold text-secondary">${data.totalResponses}</div>
-                            </div>
-                            <div class="col-6">
-                                <div class="small text-muted">Cevap Oranı</div>
-                                <div class="fs-4 fw-bold text-secondary">${data.responseRate}%</div>
-                            </div>
-                        </div>
-                        <hr class="my-2">
-                        <div class="row g-2">
-                            <div class="col-6">
-                                <div class="small text-muted">😊 Memnun</div>
-                                <div class="fs-5 fw-bold text-success">${data.satisfiedCount}</div>
-                            </div>
-                            <div class="col-6">
-                                <div class="small text-muted">😞 Memnun Değil</div>
-                                <div class="fs-5 fw-bold text-danger">${data.notSatisfiedCount}</div>
-                            </div>
-                        </div>
-                        <hr class="my-2">
-                        <div class="text-center">
-                            <div class="small text-muted mb-1">Memnuniyet Oranı</div>
-                            <div class="fs-3 fw-bold text-${satisfactionColor}">${data.satisfactionRate}%</div>
-                            <div class="progress mt-2" style="height: 10px;">
-                                <div class="progress-bar bg-${satisfactionColor}" role="progressbar" 
-                                     style="width: ${data.satisfactionRate}%" 
-                                     aria-valuenow="${data.satisfactionRate}" aria-valuemin="0" aria-valuemax="100">
+                                <div class="stat-item bg-white rounded border border-light shadow-sm text-center">
+                                    <div class="stat-label">Toplam</div>
+                                    <div class="stat-value text-primary">${data.totalUsers}</div>
                                 </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="stat-item bg-white rounded border border-light shadow-sm text-center">
+                                    <div class="stat-label">Gönderilen</div>
+                                    <div class="stat-value text-info">${data.emailsSent}</div>
+                                </div>
+                            </div>
+                             <div class="col-6">
+                                <div class="stat-item bg-white rounded border border-light shadow-sm text-center">
+                                    <div class="stat-label">😊 Memnun</div>
+                                    <div class="stat-value text-success">${data.satisfiedCount}</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="stat-item bg-white rounded border border-light shadow-sm text-center">
+                                    <div class="stat-label">😞 Değil</div>
+                                    <div class="stat-value text-danger">${data.notSatisfiedCount}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 px-2">
+                            <div class="d-flex justify-content-between align-items-end mb-2">
+                                <span class="text-secondary fw-medium small">Memnuniyet Oranı</span>
+                                <span class="fs-4 fw-bold" style="color: ${satisfactionClass}">${data.satisfactionRate}%</span>
+                            </div>
+                            <div class="progress-bar-custom">
+                                <div class="progress-fill" style="width: ${data.satisfactionRate}%; background-color: ${satisfactionClass};"></div>
+                            </div>
+                            <div class="text-end mt-1">
+                                <span class="text-muted" style="font-size: 0.75rem">Toplam ${data.totalResponses} cevap</span>
                             </div>
                         </div>
                     </div>
                 `;
                 } else {
-                    statsDisplay.innerHTML = '<div class="text-danger">❌ İstatistikler yüklenemedi</div>';
+                    statsDisplay.innerHTML = '<div class="text-danger small text-center">İstatistikler alınamadı</div>';
                 }
             } catch (err) {
-                statsDisplay.innerHTML = '<div class="text-danger">❌ Sunucu hatası!</div>';
+                statsDisplay.innerHTML = '<div class="text-danger small text-center">Bağlantı hatası</div>';
             } finally {
                 statsBtn.disabled = false;
-                statsBtn.innerText = "🔄 İstatistikleri Yenile";
+                statsBtn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Yenile';
             }
         }
 
@@ -373,5 +541,4 @@
     </script>
 
 </body>
-
 </html>
