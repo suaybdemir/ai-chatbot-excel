@@ -132,23 +132,17 @@
             transform: scale(1.05);
         }
 
-        /* Scrollbar Özelleştirme */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+        /* Scrollbar'ı tamamen GİZLE (Ama kaydırma çalışsın) */
+        .upload-section {
+            -ms-overflow-style: none;
+            /* IE ve Edge */
+            scrollbar-width: none;
+            /* Firefox */
         }
 
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
+        /* Chrome, Safari ve Opera için gizle */
+        .upload-section::-webkit-scrollbar {
+            display: none;
         }
 
         /* Sağ Taraf - Upload */
@@ -161,9 +155,6 @@
             background: #f8fafc;
             padding: 20px;
             overflow-y: auto;
-            /* Scroll barı sadece taşarsa göster */
-            scrollbar-width: thin;
-            scrollbar-color: #cbd5e1 transparent;
         }
 
         .card-custom {
