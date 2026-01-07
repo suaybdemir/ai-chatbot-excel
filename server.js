@@ -3,7 +3,7 @@ const express = require('express');
 const { createClient } = require('@supabase/supabase-js');
 const multer = require('multer');
 const xlsx = require('xlsx');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const cors = require('cors');
 const fs = require('fs');
 // SDK'yı yeni sürüme uygun çağırıyoruz:
@@ -46,23 +46,9 @@ const supabase = createClient(
     }
 })();
 
-// 3. Mail Taşıyıcısı (Özel SMTP Sunucusu)
-const smtpPort = parseInt(process.env.SMTP_PORT) || 465;
-const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.turkticaret.net',
-    port: smtpPort,
-    secure: smtpPort === 465, // 465 için true (SSL), 587 için false (STARTTLS)
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    },
-    tls: {
-        rejectUnauthorized: false // Sertifika hatalarını ignore et
-    },
-    connectionTimeout: 10000, // 10 saniye bağlantı timeout
-    greetingTimeout: 10000,   // 10 saniye greeting timeout
-    socketTimeout: 15000      // 15 saniye socket timeout
-});
+// 3. Resend Email Client
+const resend = new Resend(process.env.RESEND_API_KEY);
+const EMAIL_FROM = process.env.EMAIL_FROM || 'onboarding@resend.dev';
 
 // Dosya yükleme ayarı
 const upload = multer({ dest: 'uploads/' });
@@ -195,7 +181,7 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
                 ` : '';
 
                 const mailOptions = {
-                    from: process.env.EMAIL_USER,
+                    from: EMAIL_FROM,
                     to: email,
                     subject: not !== '' ? `Notunuz: ${not} - Hizmetimizden Memnun Musunuz?` : 'Hizmetimizden Memnun Musunuz?',
                     html: `
@@ -234,24 +220,12 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
                 };
 
                 try {
-                    // Email gönderimi için timeout ekle
-                    const sendWithTimeout = new Promise((resolve, reject) => {
-                        const timeout = setTimeout(() => {
-                            reject(new Error('Email gönderim timeout (15 saniye)'));
-                        }, 15000);
+                    // Resend ile email gönder
+                    const { data, error: sendError } = await resend.emails.send(mailOptions);
 
-                        transporter.sendMail(mailOptions)
-                            .then(result => {
-                                clearTimeout(timeout);
-                                resolve(result);
-                            })
-                            .catch(err => {
-                                clearTimeout(timeout);
-                                reject(err);
-                            });
-                    });
-
-                    await sendWithTimeout;
+                    if (sendError) {
+                        throw new Error(sendError.message);
+                    }
 
                     // Veritabanını güncelle
                     const { error } = await supabase
