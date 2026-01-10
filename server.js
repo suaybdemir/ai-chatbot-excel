@@ -56,10 +56,20 @@ const supabase = createClient(
 })();
 
 // 3. Mailjet Email Client
-const mailjet = new Mailjet({
-    apiKey: process.env.MAILJET_API_KEY,
-    apiSecret: process.env.MAILJET_SECRET_KEY
-});
+// 3. Mailjet Email Client (Optional)
+let mailjet;
+if (process.env.MAILJET_API_KEY && process.env.MAILJET_SECRET_KEY) {
+    try {
+        mailjet = new Mailjet({
+            apiKey: process.env.MAILJET_API_KEY,
+            apiSecret: process.env.MAILJET_SECRET_KEY
+        });
+    } catch (err) {
+        console.warn('⚠️ Mailjet başlatılamadı:', err.message);
+    }
+} else {
+    console.warn('⚠️ Mailjet anahtarları eksik. Email gönderimi devre dışı.');
+}
 const EMAIL_FROM = process.env.EMAIL_FROM || 'noreply@example.com';
 const EMAIL_FROM_NAME = process.env.EMAIL_FROM_NAME || 'Bildirim Sistemi';
 
@@ -439,6 +449,8 @@ app.post('/api/upload-and-send-emails', upload.single('file'), async (req, res) 
                     `;
 
                 try {
+                    if (!mailjet) throw new Error("Mailjet servisi aktif değil (API Keys eksik).");
+
                     // Mailjet ile email gönder
                     const result = await mailjet
                         .post("send", { 'version': 'v3.1' })

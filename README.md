@@ -1,4 +1,6 @@
 # AI Chatbot & Excel Mailer
+![Chatbot Preview](image.png)
+![Dashboard Preview](image%20copy%202.png)
 
 🤖 Mistral AI destekli chatbot ve Excel tabanlı memnuniyet anketi sistemi.
 
